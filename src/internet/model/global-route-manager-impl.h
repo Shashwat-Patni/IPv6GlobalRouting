@@ -13,6 +13,7 @@
 #include "global-router-interface.h"
 
 #include "ns3/ipv4-address.h"
+#include "ns3/ipv4-routing-helper.h"
 #include "ns3/object.h"
 #include "ns3/ptr.h"
 
@@ -725,6 +726,43 @@ class GlobalRouteManagerImpl
      * @param root the root node to start calculations
      */
     void DebugSPFCalculate(Ipv4Address root);
+
+    /**
+     * @brief given IP it iterates through the node list to find the node associated with the ip
+     * @param source ip address associated with the node we want to find
+     * @returns the node pointer to the ip
+     */
+    Ptr<Node> GetNodeByIp(Ipv4Address source);
+
+    /**
+     *@brief prints the path from this node to the destination node at a particular time.
+     * @param sourceNode the source node
+     * @param dest the destination node
+     * @param stream The output stream to which the routing path will be written.
+     * @param nodeIdLookup Print the Node Id
+     * @param unit The time unit for timestamps in the printed output.
+     * @see Ipv4GlobalRoutingHelper::PrintRoute
+     */
+    void PrintRoute(Ptr<Node> sourceNode,
+                    Ptr<Node> dest,
+                    Ptr<OutputStreamWrapper> stream,
+                    bool nodeIdLookup,
+                    Time::Unit unit);
+
+    /**
+     *@brief prints the path from this node to the destination node at a particular time.
+     * @param sourceNode the source node
+     * @param dest the destination nodes ipv4 address
+     * @param stream The output stream to which the routing path will be written.
+     * @param nodeIdLookup Print the node id
+     * @param unit The time unit for timestamps in the printed output.
+     * @see Ipv4GlobalRoutingHelper::PrintRoute
+     */
+    void PrintRoute(Ptr<Node> sourceNode,
+                    Ipv4Address dest,
+                    Ptr<OutputStreamWrapper> stream,
+                    bool nodeIdLookup,
+                    Time::Unit unit);
 
   private:
     SPFVertex* m_spfroot;           //!< the root node
