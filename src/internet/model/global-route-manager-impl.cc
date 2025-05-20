@@ -15,6 +15,7 @@
 #include "candidate-queue.h"
 #include "global-router-interface.h"
 #include "ipv4-global-routing.h"
+#include "ipv4-l3-protocol.h"
 #include "ipv4.h"
 
 #include "ns3/assert.h"
@@ -24,6 +25,7 @@
 #include "ns3/simulator.h"
 
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <queue>
 #include <utility>
@@ -2156,6 +2158,325 @@ GlobalRouteManagerImpl::SPFVertexAddParent(SPFVertex* v)
         }
         parent->AddChild(v);
     }
+}
+
+Ptr<Node>
+GlobalRouteManagerImpl::GetNodeByIP(Ipv4Address address)
+{
+    // iterate through the list of nodes
+    for (auto i = NodeList::Begin(); i != NodeList::End(); ++i)
+    {
+        Ptr<Node> node = *i;
+        Ptr<Ipv4> ipv4 = node->GetObject<Ipv4>();
+
+        if (ipv4 != nullptr)
+        {
+            int32_t interface = ipv4->GetInterfaceForAddress(address);
+            if (interface >= 0) // Address found on this node
+            {
+                return node;
+            }
+        }
+    }
+    return nullptr; // If no node with the given IP address was found
+}
+
+void
+GlobalRouteManagerImpl::PrintRoutingPath(Ptr<Node> sourceNode,
+                                         Ipv4Address dest,
+                                         Ptr<OutputStreamWrapper> stream,
+                                         Time::Unit unit)
+{
+    NS_LOG_FUNCTION(this << sourceNode << dest);
+
+    Ptr<Node> destNode = GetNodeByIP(dest);
+
+    // check that dest is a valid ip
+    if (dest == Ipv4Address::GetLoopback())
+    {
+        NS_LOG_ERROR("Destination IP is ambiguous");
+        return;
+    }
+
+    // check that given ipv4address exists
+    if (sourceNode == nullptr)
+    {
+        NS_LOG_ERROR("No Source Node Provided");
+        return;
+    }
+
+    if (destNode == nullptr)
+    {
+        NS_LOG_ERROR("Destination node not found for IP address: " << dest);
+        return;
+    }
+
+    Ptr<Ipv4> ipv4 = sourceNode->GetObject<Ipv4>();
+    // check for ipv4 stack
+    if (ipv4 == nullptr)
+    {
+        NS_LOG_ERROR("No Ipv4 object found on source node " << sourceNode->GetId());
+        return;
+    }
+
+    // check if source has ipv4 address assigned to it
+    bool hasAddress = false;
+    uint32_t numInter = ipv4->GetNInterfaces();
+    if (numInter == 0)
+    {
+        NS_LOG_ERROR("No interfaces associated with source Node");
+        return;
+    }
+    for (uint32_t i = 0; i < numInter; i++)
+    {
+        if (ipv4->GetNAddresses(i) > 0)
+        {
+            hasAddress = true;
+            break;
+        }
+    }
+    if (!hasAddress)
+    {
+        NS_LOG_ERROR("No IP address associated with source Node");
+        return;
+    }
+
+    // check if source node has either global Routing or if Listrouting and globalrouting in
+    // Listrouting
+    Ptr<Ipv4GlobalRouting> globalRouting =
+        DynamicCast<Ipv4GlobalRouting>(ipv4->GetRoutingProtocol());
+
+    if (globalRouting == nullptr)
+    {
+        Ptr<Ipv4ListRouting> listRouting = DynamicCast<Ipv4ListRouting>(ipv4->GetRoutingProtocol());
+
+        // Ensure it's a valid Ipv4ListRouting
+        if (listRouting != nullptr)
+        {
+            for (uint32_t i = 0; i < listRouting->GetNRoutingProtocols(); i++)
+            {
+                // Initialize priority
+                int16_t priority = 0;
+                Ptr<Ipv4GlobalRouting> tempglobalRouting =
+                    DynamicCast<Ipv4GlobalRouting>(listRouting->GetRoutingProtocol(i, priority));
+
+                if (tempglobalRouting != nullptr)
+                {
+                    // Found a global routing protocol inside the list
+                    globalRouting = tempglobalRouting;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Final check: If still nullptr, GlobalRouting wasn't found anywhere
+    if (globalRouting == nullptr)
+    {
+        NS_LOG_ERROR("No global routing protocol found on source node " << sourceNode->GetId());
+        return;
+    }
+
+    std::ostream* os = stream->GetStream();
+    // Copy the current ostream state
+    std::ios oldState(nullptr);
+    oldState.copyfmt(*os);
+
+    *os << std::resetiosflags(std::ios::adjustfield) << std::setiosflags(std::ios::left);
+    *os << "Time: " << Now().As(unit) << ", Global Routing" << std::endl;
+    *os << "Route path from ";
+    *os << "Node " << sourceNode->GetId() << " to Node " << destNode->GetId() << std::endl;
+
+    if (sourceNode == destNode)
+    {
+        std::ostringstream addr;
+        std::ostringstream node;
+        addr << dest;
+        node << "(Node " << destNode->GetId() << ")";
+        *os << std::setw(25) << addr.str();
+        *os << std::setw(10) << node.str();
+        *os << "---->   ";
+        *os << std::setw(25) << addr.str();
+        *os << node.str() << std::endl;
+        return;
+    }
+
+    // we start searching for gateways
+    Ptr<Node> currentNode = sourceNode;
+    Ipv4Address currentNodeIp;
+    std::list<Ptr<Node>> visitedNodes;
+    visitedNodes.push_back(currentNode);
+
+    // first check if its local delivery
+    uint32_t numInterfaces = ipv4->GetNInterfaces();
+    for (uint32_t i = 0; i < numInterfaces; i++)
+    {
+        uint32_t numAddresses = ipv4->GetNAddresses(i);
+        for (uint32_t j = 0; j < numAddresses; j++)
+        {
+            Ipv4InterfaceAddress senderAddr = ipv4->GetAddress(i, j);
+            Ipv4Mask mask = senderAddr.GetMask();
+
+            // Check if the destination is within the same subnet
+            if (mask.IsMatch(dest, senderAddr.GetLocal()))
+            {
+                std::ostringstream currAddr;
+                std::ostringstream currNode;
+                std::ostringstream nextAddr;
+                std::ostringstream nextNode;
+                currAddr << senderAddr.GetLocal();
+                currNode << "(Node " << sourceNode->GetId() << ")";
+                *os << std::setw(25) << currAddr.str();
+                *os << std::setw(10) << currNode.str();
+                nextAddr << dest;
+                nextNode << "(Node " << destNode->GetId() << ")";
+                *os << "---->   ";
+                *os << std::setw(25) << nextAddr.str();
+                *os << nextNode.str() << std::endl << std::endl;
+                return;
+            }
+        }
+    }
+
+    // check if routes exist
+    // NOLINTNEXTLINE
+    if (globalRouting->LookupGlobal(dest, 0) == nullptr)
+    {
+        *os << "There does not exist a path from Node " << sourceNode->GetId() << " to Node "
+            << destNode->GetId() << "." << std::endl
+            << std::endl;
+        return;
+    }
+
+    uint32_t maxhop = 64;
+    while (currentNode != destNode)
+    {
+        NS_ASSERT_MSG(maxhop, "Max Hop Limit reached");
+
+        Ptr<Ipv4> ipv4currentnode = currentNode->GetObject<Ipv4>();
+        uint32_t currentNodeID = currentNode->GetId();
+        Ptr<Ipv4GlobalRouting> router =
+            DynamicCast<Ipv4GlobalRouting>(ipv4currentnode->GetRoutingProtocol());
+        if (router == nullptr)
+        {
+            Ptr<Ipv4ListRouting> listRouter =
+                DynamicCast<Ipv4ListRouting>(ipv4currentnode->GetRoutingProtocol());
+
+            // Ensure it's a valid Ipv4ListRouting
+            if (listRouter != nullptr)
+            {
+                for (uint32_t i = 0; i < listRouter->GetNRoutingProtocols(); i++)
+                {
+                    // Initialize priority
+                    int16_t priority = 0;
+                    Ptr<Ipv4GlobalRouting> tempRouter =
+                        DynamicCast<Ipv4GlobalRouting>(listRouter->GetRoutingProtocol(i, priority));
+                    if (tempRouter != nullptr)
+                    {
+                        // Found a global routing protocol inside the list
+                        router = tempRouter;
+                        break;
+                    }
+                }
+            }
+        }
+        // Final check: If still nullptr, GlobalRouting wasn't found anywhere
+        if (router == nullptr)
+        {
+            NS_LOG_ERROR("No global router found on Node " << currentNodeID);
+            return;
+        }
+        // NOLINTNEXTLINE
+        Ptr<Ipv4Route> gateway = router->LookupGlobal(dest, 0);
+        // check if the gateway exists
+        if (gateway == nullptr)
+        {
+            NS_LOG_ERROR("No next hop found");
+            return;
+        }
+
+        Ipv4Address gatewayAddress = gateway->GetGateway();
+        Ptr<Node> nextNode = GetNodeByIP(gatewayAddress);
+
+        if (nextNode == nullptr)
+        {
+            // check if its local delivery if its not and still null then there is no next jump
+            uint32_t numInterfaces = ipv4currentnode->GetNInterfaces();
+            for (uint32_t i = 0; i < numInterfaces; i++)
+            {
+                uint32_t numAddresses = ipv4currentnode->GetNAddresses(i);
+                for (uint32_t j = 0; j < numAddresses; j++)
+                {
+                    Ipv4InterfaceAddress senderAddr = ipv4currentnode->GetAddress(i, j);
+                    Ipv4Mask mask = senderAddr.GetMask();
+
+                    // Check if the destination is within the same subnet
+                    if (mask.IsMatch(dest, senderAddr.GetLocal()))
+                    {
+                        std::ostringstream currAddr;
+                        std::ostringstream currNode;
+                        std::ostringstream nextAddr;
+                        std::ostringstream nextNode;
+                        currAddr << senderAddr.GetLocal();
+                        currNode << "(Node " << currentNode->GetId() << ")";
+                        *os << std::setw(25) << currAddr.str();
+                        *os << std::setw(10) << currNode.str();
+                        nextAddr << dest;
+                        nextNode << "(Node " << destNode->GetId() << ")";
+                        *os << "---->   ";
+                        *os << std::setw(25) << nextAddr.str();
+                        *os << nextNode.str() << std::endl << std::endl;
+                        return;
+                    }
+                }
+            }
+            *os << gatewayAddress << " No next jump found from Node" << currentNode->GetId()
+                << std::endl;
+            return;
+        }
+
+        if (nextNode == currentNode)
+        {
+            *os << "Invalid route: Next hop points back to the current node (Node "
+                << currentNode->GetId() << ").\n";
+            NS_LOG_ERROR("Invalid route: Next hop points back to the current node.");
+            return;
+        }
+        // check for loops
+        if (std::find(visitedNodes.begin(), visitedNodes.end(), nextNode) != visitedNodes.end())
+        {
+            *os << "Loop detected! Node " << nextNode->GetId() << " revisited.\n";
+            NS_LOG_ERROR("Routing Loop detected");
+            return;
+        }
+        visitedNodes.push_back(nextNode);
+
+        // print this iteration
+        Ptr<NetDevice> outdevice = gateway->GetOutputDevice();
+        Ptr<Ipv4L3Protocol> ipl3 = currentNode->GetObject<Ipv4L3Protocol>();
+        uint32_t interfaceIndex = ipv4currentnode->GetInterfaceForDevice(outdevice);
+        currentNodeIp = ipl3->SourceAddressSelection(interfaceIndex, gatewayAddress);
+
+        std::ostringstream currAddr;
+        std::ostringstream currNode;
+        std::ostringstream nextAddr;
+        std::ostringstream next;
+        currAddr << currentNodeIp;
+        currNode << "(Node " << currentNode->GetId() << ")";
+        *os << std::setw(25) << currAddr.str();
+        *os << std::setw(10) << currNode.str();
+        nextAddr << gatewayAddress;
+        next << "(Node " << nextNode->GetId() << ")";
+        *os << "---->   ";
+        *os << std::setw(25) << nextAddr.str();
+        *os << next.str() << std::endl;
+        currentNode = nextNode;
+        currentNodeIp = gatewayAddress;
+        maxhop--;
+    }
+    *os << std::endl;
+    // Restore the previous ostream state
+    (*os).copyfmt(oldState);
 }
 
 } // namespace ns3

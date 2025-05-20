@@ -56,9 +56,21 @@ GlobalRouteManager::AllocateRouterId()
 }
 
 void
+<<<<<<< HEAD
 GlobalRouteManager::ResetRouterId()
 {
     routerId = 0;
+=======
+GlobalRouteManager::PrintRoutingPath(Ptr<Node> sourceNode,
+                                     Ipv4Address dest,
+                                     Ptr<OutputStreamWrapper> stream,
+                                     Time::Unit unit)
+{
+    SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoutingPath(sourceNode,
+                                                                         dest,
+                                                                         stream,
+                                                                         unit);
+>>>>>>> 5bdd5be8c (Internet: Add Print Route Functionality for Global Routing)
 }
 
 } // namespace ns3
