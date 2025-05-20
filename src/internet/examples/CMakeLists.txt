@@ -25,3 +25,14 @@ build_lib_example(
     ${libinternet}
     ${libnetwork}
 )
+
+build_lib_example(
+  NAME Ipv4-global-routing-print-route
+  SOURCE_FILES Ipv4-global-routing-print-route.cc
+  LIBRARIES_TO_LINK
+    ${libcsma}
+    ${libinternet}
+    ${libnetwork}
+    ${libapplications}
+    ${libpoint-to-point}
+)
