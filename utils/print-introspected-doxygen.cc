@@ -1179,7 +1179,14 @@ PrintAllGroups(std::ostream& os)
 
     for (const auto& g : groups)
     {
-        os << boldStart << g.first << boldStop << breakHtmlOnly << std::endl;
+        std::string anchor = g.first;
+        std::string groupname = g.first;
+        std::transform(groupname.begin(), groupname.end(), groupname.begin(), [](unsigned char c) {
+            return std::tolower(c);
+        });
+        os << "\\anchor " << anchor << std::endl;
+        os << boldStart << hrefStart << g.first << hrefMid << groupname << hrefStop << boldStop
+           << std::endl;
 
         os << listStart << std::endl;
         for (const auto& tid : g.second)
