@@ -74,6 +74,9 @@ class GlobalRouteManager
                                  Ipv4Address dest,
                                  Ptr<OutputStreamWrapper> stream,
                                  Time::Unit unit);
+
+  private:
+    static uint32_t routerId;
 };
 
 } // namespace ns3

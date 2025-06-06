@@ -50,7 +50,6 @@ uint32_t
 GlobalRouteManager::AllocateRouterId()
 {
     NS_LOG_FUNCTION_NOARGS();
-    static uint32_t routerId = 0;
     return routerId++;
 }
 
@@ -65,5 +64,7 @@ GlobalRouteManager::PrintRoutingPath(Ptr<Node> sourceNode,
                                                                          stream,
                                                                          unit);
 }
+
+uint32_t GlobalRouteManager::routerId = 0;
 
 } // namespace ns3
