@@ -56,11 +56,12 @@ GlobalRouteManager::AllocateRouterId()
 }
 
 void
-<<<<<<< HEAD
 GlobalRouteManager::ResetRouterId()
 {
     routerId = 0;
-=======
+}
+
+void
 GlobalRouteManager::PrintRoutingPath(Ptr<Node> sourceNode,
                                      Ipv4Address dest,
                                      Ptr<OutputStreamWrapper> stream,
@@ -70,7 +71,6 @@ GlobalRouteManager::PrintRoutingPath(Ptr<Node> sourceNode,
                                                                          dest,
                                                                          stream,
                                                                          unit);
->>>>>>> 5bdd5be8c (Internet: Add Print Route Functionality for Global Routing)
 }
 
 uint32_t GlobalRouteManager::routerId = 0;
