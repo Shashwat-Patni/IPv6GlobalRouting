@@ -73,4 +73,6 @@ GlobalRouteManager::PrintRoutingPath(Ptr<Node> sourceNode,
 >>>>>>> 5bdd5be8c (Internet: Add Print Route Functionality for Global Routing)
 }
 
+uint32_t GlobalRouteManager::routerId = 0;
+
 } // namespace ns3
