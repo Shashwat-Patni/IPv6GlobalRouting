@@ -54,6 +54,12 @@ GlobalRouteManager::AllocateRouterId()
 }
 
 void
+GlobalRouteManager::ResetRouterId()
+{
+    routerId = 0;
+}
+
+void
 GlobalRouteManager::PrintRoutingPath(Ptr<Node> sourceNode,
                                      Ipv4Address dest,
                                      Ptr<OutputStreamWrapper> stream,
