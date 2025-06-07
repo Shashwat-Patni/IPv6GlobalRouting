@@ -92,7 +92,7 @@ class GlobalRouteManager
     static void ResetRouterId();
 
   private:
-    static uint32_t routerId;
+    static uint32_t routerId; //!< Router ID counter
 };
 
 } // namespace ns3
