@@ -694,7 +694,7 @@ RandomEcmpTestCase::CheckRoutes(Ptr<Ipv4GlobalRouting>& globalroutingprotocol,
                                 std::vector<Ipv4Address>& dests,
                                 std::vector<Ipv4Address>& gws)
 {
-    // check each indivual routes destination and gateway
+    // check each individual routes destination and gateway
     for (uint32_t i = 0; i < globalroutingprotocol->GetNRoutes(); i++)
     {
         Ipv4RoutingTableEntry* route = globalroutingprotocol->GetRoute(i);
