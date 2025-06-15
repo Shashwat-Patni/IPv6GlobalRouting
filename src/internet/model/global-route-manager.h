@@ -10,12 +10,23 @@
 #ifndef GLOBAL_ROUTE_MANAGER_H
 #define GLOBAL_ROUTE_MANAGER_H
 
+#include "ipv6.h"
+
 #include "ns3/ipv4-routing-helper.h"
+#include "ns3/ipv6-routing-helper.h"
 
 #include <cstdint>
 
 namespace ns3
 {
+
+struct Ipv4Manager
+{
+};
+
+struct Ipv6Manager
+{
+};
 
 /**
  * @ingroup globalrouting
@@ -30,12 +41,25 @@ namespace ns3
  *
  * The design is guided by OSPFv2 \RFC{2328} section 16.1.1 and quagga ospfd.
  */
+
+template <typename T,
+          typename =
+              std::enable_if_t<std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>>>
 class GlobalRouteManager
 {
+    /// Alias for determining whether the parent is Ipv4RoutingProtocol or Ipv6RoutingProtocol
+    static constexpr bool IsIpv4 = std::is_same_v<Ipv4Manager, T>;
+
+    /// Alias for Ipv4 and Ipv6 classes
+    using Ip = typename std::conditional_t<IsIpv4, Ipv4, Ipv6>;
+
+    /// Alias for Ipv4Address and Ipv6Address classes
+    using IpAddress = typename std::conditional_t<IsIpv4, Ipv4Address, Ipv6Address>;
+
   public:
     // Delete copy constructor and assignment operator to avoid misuse
-    GlobalRouteManager(const GlobalRouteManager&) = delete;
-    GlobalRouteManager& operator=(const GlobalRouteManager&) = delete;
+    GlobalRouteManager(const GlobalRouteManager<T>&) = delete;
+    GlobalRouteManager& operator=(const GlobalRouteManager<T>&) = delete;
 
     /**
      * @brief Allocate a 32-bit router ID from monotonically increasing counter.
@@ -71,7 +95,7 @@ class GlobalRouteManager
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */
     static void PrintRoutingPath(Ptr<Node> sourceNode,
-                                 Ipv4Address dest,
+                                 IpAddress dest,
                                  Ptr<OutputStreamWrapper> stream,
                                  Time::Unit unit);
 

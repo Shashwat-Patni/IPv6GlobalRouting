@@ -497,7 +497,7 @@ GlobalRouter::GlobalRouter()
     : m_LSAs()
 {
     NS_LOG_FUNCTION(this);
-    m_routerId.Set(GlobalRouteManager::AllocateRouterId());
+    m_routerId.Set(GlobalRouteManager<Ipv4Manager>::AllocateRouterId());
 }
 
 GlobalRouter::~GlobalRouter()
