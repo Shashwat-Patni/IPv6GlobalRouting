@@ -412,7 +412,7 @@ LinkRoutesTestCase::DoRun()
     delete srm;
     // reset the router ID counter to zero so that it does not affect other tests
     //  that may run after this one in the same program run.
-    GlobalRouteManager::ResetRouterId();
+    GlobalRouteManager<Ipv4Manager>::ResetRouterId();
 }
 
 /**
@@ -579,7 +579,7 @@ LanRoutesTestCase::DoRun()
     // This delete clears the srm, which deletes the LSDB, which clears
     // all of the LSAs, which each destroys the attached LinkRecords.
     delete srm;
-    GlobalRouteManager::ResetRouterId();
+    GlobalRouteManager<Ipv4Manager>::ResetRouterId();
 }
 
 /**

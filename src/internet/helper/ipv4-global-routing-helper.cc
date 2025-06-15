@@ -49,8 +49,8 @@ Ipv4GlobalRoutingHelper::Create(Ptr<Node> node) const
 void
 Ipv4GlobalRoutingHelper::PopulateRoutingTables()
 {
-    GlobalRouteManager::BuildGlobalRoutingDatabase();
-    GlobalRouteManager::InitializeRoutes();
+    GlobalRouteManager<Ipv4Manager>::BuildGlobalRoutingDatabase();
+    GlobalRouteManager<Ipv4Manager>::InitializeRoutes();
 }
 
 void
@@ -61,7 +61,7 @@ Ipv4GlobalRoutingHelper::PrintRoutingPathAt(Time printTime,
                                             Time::Unit unit)
 {
     Simulator::Schedule(printTime,
-                        &Ipv4GlobalRoutingHelper::PrintRoute,
+                        &GlobalRoutingHelper<T>::PrintRoute,
                         sourceNode,
                         dest,
                         stream,
@@ -74,15 +74,15 @@ Ipv4GlobalRoutingHelper::PrintRoute(Ptr<Node> sourceNode,
                                     Ptr<OutputStreamWrapper> stream,
                                     Time::Unit unit)
 {
-    GlobalRouteManager::PrintRoutingPath(sourceNode, dest, stream, unit);
+    GlobalRouteManager<Ipv4Manager>::PrintRoutingPath(sourceNode, dest, stream, unit);
 }
 
 void
 Ipv4GlobalRoutingHelper::RecomputeRoutingTables()
 {
-    GlobalRouteManager::DeleteGlobalRoutes();
-    GlobalRouteManager::BuildGlobalRoutingDatabase();
-    GlobalRouteManager::InitializeRoutes();
+    GlobalRouteManager<Ipv4Manager>::DeleteGlobalRoutes();
+    GlobalRouteManager<Ipv4Manager>::BuildGlobalRoutingDatabase();
+    GlobalRouteManager<Ipv4Manager>::InitializeRoutes();
 }
 
 } // namespace ns3
