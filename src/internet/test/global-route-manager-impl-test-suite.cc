@@ -987,7 +987,6 @@ class GlobalRouteManagerImplTestSuite : public TestSuite
 {
   public:
     GlobalRouteManagerImplTestSuite();
-    static void CheckPath();
 
   private:
 };
@@ -998,11 +997,6 @@ GlobalRouteManagerImplTestSuite::GlobalRouteManagerImplTestSuite()
     AddTestCase(new LinkRoutesTestCase(), TestCase::Duration::QUICK);
     AddTestCase(new LanRoutesTestCase(), TestCase::Duration::QUICK);
     AddTestCase(new RandomEcmpTestCase(), TestCase::Duration::QUICK);
-}
-
-void
-GlobalRouteManagerImplTestSuite::CheckPath()
-{
 }
 
 static GlobalRouteManagerImplTestSuite
