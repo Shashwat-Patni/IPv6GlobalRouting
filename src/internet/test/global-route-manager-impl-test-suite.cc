@@ -431,8 +431,8 @@ class LanRoutesTestCase : public TestCase
   private:
     /**
      *@brief Builds the LSAs for the topology. These LSAs are manually created and inserted into the
-     * GlobalRouteManagerLSDB.Each node exports a router LSA. In addition,the designated router(See
-     *OSPFv2 RFC) Also Exports the Network LSA.
+     * GlobalRouteManagerLSDB.Each node exports a router LSA. In addition,the designated router.Also
+     *Exports the Network LSA.
      */
     void BuildLsa();
 
@@ -598,7 +598,8 @@ class RandomEcmpTestCase : public TestCase
 
   private:
     /**
-     *
+     *@brief Builds the LSAs for the topology. These LSAs are manually created and inserted into the
+     * GlobalRouteManagerLSDB.Each node exports a router LSA.
      */
     void BuildLsa();
 
