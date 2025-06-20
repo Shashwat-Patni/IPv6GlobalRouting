@@ -1294,15 +1294,10 @@ class GlobalRoutingProtocolTestCase : public TestCase
                    std::vector<Ptr<Node>> intermediate,
                    std::vector<Ipv4Address> Path);
 
-    NodeContainer c;
+    NodeContainer nodes; //!< Nodes used in the test.
 };
 
-void
-GlobalRoutingProtocolTestCase::CheckPath(Ptr<Node> source,
-                                         std::vector<Ptr<Node>> intermediate,
-                                         std::vector<Ipv4Address> Path)
-{
-}
+
 
 GlobalRoutingProtocolTestCase::GlobalRoutingProtocolTestCase()
     : TestCase("Test API calls to GlobalRoutingProtocol")
@@ -1314,8 +1309,46 @@ GlobalRoutingProtocolTestCase::~GlobalRoutingProtocolTestCase()
 }
 
 void
-CheckPath()
+GlobalRoutingProtocolTestCase::CheckPath(Ptr<Node> source,
+                                         std::vector<Ptr<Node>> intermediate,
+                                         std::vector<Ipv4Address> path)
 {
+    uint32_t pathSize= path.size();
+
+    Ptr<Ipv4L3Protocol> ip = source->GetObject<Ipv4L3Protocol>();
+    NS_TEST_ASSERT_MSG_NE(ip, nullptr, "Error-- no Ipv4 object at source node");
+    Ptr<Ipv4RoutingProtocol> routing = ip->GetRoutingProtocol();
+    NS_TEST_ASSERT_MSG_NE(routing, nullptr, "Error-- no Ipv4 routing protocol object at source node");
+    Ptr<Ipv4GlobalRouting> globalRouting = routing->GetObject<Ipv4GlobalRouting>();
+    NS_TEST_ASSERT_MSG_NE(globalRouting, nullptr, "Error-- no Ipv4GlobalRouting object at source node");
+
+    Socket::SocketErrno errno_;
+    Ptr<NetDevice> oif(nullptr);
+    Ptr<Packet> packet = Create<Packet>();
+    Ipv4Header ipHeader;
+    ipHeader.SetSource(path[0]);
+    ipHeader.SetDestination(path[pathSize-1]);
+
+    Ptr<Ipv4Route> route = globalRouting->RouteOutput(packet, ipHeader, oif, errno_);
+    for(uint32_t i=1;i<pathSize-1;i++)
+    {
+//   NS_TEST_ASSERT_MSG_EQ( route->GetGateway(),path[i],"Error-- wrong gateway");
+
+
+                ip = source->GetObject<Ipv4L3Protocol>();
+    NS_TEST_ASSERT_MSG_NE(ip, nullptr, "Error-- no Ipv4 object at node");
+    routing = ip->GetRoutingProtocol();
+    NS_TEST_ASSERT_MSG_NE(routing, nullptr, "Error-- no Ipv4 routing protocol object at node");
+    globalRouting = routing->GetObject<Ipv4GlobalRouting>();
+    NS_TEST_ASSERT_MSG_NE(globalRouting, nullptr, "Error-- no Ipv4GlobalRouting object at node");
+
+        //we need to check if RouteInput() for all intermediate nodes 
+        // we need to create callbacks for routeInput()
+        // we need to access the routes returned to these callbacks
+    
+
+    }
+
 }
 
 void
@@ -1338,21 +1371,23 @@ GlobalRoutingProtocolTestCase::DoSetup()
     //
     //
     //
-    GlobalRouteManager<Ipv4Manager>::ResetRouterId();
-    c.Create(10);
-    NodeContainer n0n2 = NodeContainer(c.Get(0), c.Get(2));
-    NodeContainer n1n2 = NodeContainer(c.Get(1), c.Get(2));
-    NodeContainer n5n6 = NodeContainer(c.Get(5), c.Get(6));
-    NodeContainer n1n6 = NodeContainer(c.Get(1), c.Get(6));
-    NodeContainer n2345 = NodeContainer(c.Get(2), c.Get(3), c.Get(4), c.Get(5));
-    NodeContainer n67 =NodeContainer(c.Get(6),c.Get(7));
+    
+    
+    
+    
+    nodes.Create(10);
+    NodeContainer n0n2 = NodeContainer(nodes.Get(0), nodes.Get(2));
+    NodeContainer n1n2 = NodeContainer(nodes.Get(1), nodes.Get(2));
+    NodeContainer n5n6 = NodeContainer(nodes.Get(5), nodes.Get(6));
+    NodeContainer n1n6 = NodeContainer(nodes.Get(1), nodes.Get(6));
+    NodeContainer n2345 = NodeContainer(nodes.Get(2), nodes.Get(3), nodes.Get(4), nodes.Get(5));
+    NodeContainer n67 =NodeContainer(nodes.Get(6),nodes.Get(7));
 
    
     // We create the channels first without any IP addressing information
     SimpleNetDeviceHelper devHelper;
 
-    NetDeviceContainer bridgeFacingDevices;
-    NetDeviceContainer switchDevices;
+  
 
     devHelper.SetNetDevicePointToPointMode(true);
     NetDeviceContainer d0d2 = devHelper.Install(n0n2);
@@ -1361,8 +1396,8 @@ GlobalRoutingProtocolTestCase::DoSetup()
     NetDeviceContainer d5d6 = devHelper.Install(n5n6);
     Ptr<SimpleChannel> channel3 = CreateObject<SimpleChannel>();
     devHelper.SetNetDevicePointToPointMode(false);
-    NetDeviceContainer d6d7= devHelper.Install(c.Get(6),channel3);
-    d6d7.Add(devHelper.Install(c.Get(7),channel3));
+    NetDeviceContainer d6d7= devHelper.Install(nodes.Get(6),channel3);
+    d6d7.Add(devHelper.Install(nodes.Get(7),channel3));
 
     devHelper.SetNetDevicePointToPointMode(false);
     NetDeviceContainer d2345 = devHelper.Install(n2345);
@@ -1371,45 +1406,42 @@ GlobalRoutingProtocolTestCase::DoSetup()
     //connect node 7 to node 8(Switch)
     Ptr<SimpleChannel> channel1 = CreateObject<SimpleChannel>();
     SimpleNetDeviceHelper simpleHelper1;
-    NetDeviceContainer d78 = simpleHelper1.Install(c.Get(7), channel1);
-    d78.Add(simpleHelper1.Install(c.Get(8), channel1));
-    bridgeFacingDevices.Add(d78.Get(0));
+    NetDeviceContainer d78 = simpleHelper1.Install(nodes.Get(7), channel1);
+    d78.Add(simpleHelper1.Install(nodes.Get(8), channel1));
+    
+  NetDeviceContainer bridgeFacingDevices;
+    NetDeviceContainer switchDevices;
+  bridgeFacingDevices.Add(d78.Get(0));
     switchDevices.Add(d78.Get(1));
-
-  
 
     //connect node 8(switch) to node 9
     Ptr<SimpleChannel> channel2 = CreateObject<SimpleChannel>();
     SimpleNetDeviceHelper simpleHelper2;
 
-    NetDeviceContainer d89 = simpleHelper2.Install(c.Get(8), channel2);
-    d89.Add(simpleHelper2.Install(c.Get(9), channel2));
+    NetDeviceContainer d89 = simpleHelper2.Install(nodes.Get(8), channel2);
+    d89.Add(simpleHelper2.Install(nodes.Get(9), channel2));
     bridgeFacingDevices.Add(d89.Get(1));
     switchDevices.Add(d89.Get(0));
 
-    Ptr<Node> switchNode = c.Get(8);
+    Ptr<Node> switchNode = nodes.Get(8);
     BridgeHelper bridge;
     bridge.Install(switchNode, switchDevices);
     
 
-    //connect n6 to n7 
-    
-
-
  InternetStackHelper internet;
     Ipv4GlobalRoutingHelper glbrouting;
     internet.SetRoutingHelper(glbrouting);
-    internet.Install(c.Get(0));
-    internet.Install(c.Get(1));
-    internet.Install(c.Get(2));
-    internet.Install(c.Get(3));
-    internet.Install(c.Get(4));
-    internet.Install(c.Get(5));
-    internet.Install(c.Get(6));
-    internet.Install(c.Get(7));
+    internet.Install(nodes.Get(0));
+    internet.Install(nodes.Get(1));
+    internet.Install(nodes.Get(2));
+    internet.Install(nodes.Get(3));
+    internet.Install(nodes.Get(4));
+    internet.Install(nodes.Get(5));
+    internet.Install(nodes.Get(6));
+    internet.Install(nodes.Get(7));
     //node 8 is a bridge node 
     //internet.Install(c.Get(8));
-    internet.Install(c.Get(9));
+    internet.Install(nodes.Get(9));
 
     // Later, we add IP addresses.
     Ipv4AddressHelper ipv4;
@@ -1446,8 +1478,6 @@ GlobalRoutingProtocolTestCase::DoRun()
     // Create router nodes, initialize routing database and set up the routing
     // tables in the nodes.
     GlobalRouteManager<Ipv4Manager>::ResetRouterId();
-    LogComponentEnable("GlobalRouteManagerImpl",LOG_LEVEL_LOGIC);
-    LogComponentEnable("GlobalRouteManagerImpl",LOG_PREFIX_FUNC);
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables();
    
@@ -1466,9 +1496,14 @@ GlobalRoutingProtocolTestCase::DoRun()
     pathToCheck1.emplace_back("172.16.1.2");
 
     std::vector<Ptr<Node>> intermediateNodes1;
-    intermediateNodes1.push_back(c.Get(2));
-    intermediateNodes1.push_back(c.Get(1));
+    intermediateNodes1.push_back(nodes.Get(2));
+    intermediateNodes1.push_back(nodes.Get(1));
 
+    CheckPath(nodes.Get(0) ,intermediateNodes1,pathToCheck1);
+
+    Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper>(&std::cout);
+    Ipv4GlobalRoutingHelper::PrintRoutingTableAt(Seconds(2),nodes.Get(7),routingStream);
+    Ipv4GlobalRoutingHelper::PrintRoutingPathAt(Seconds(2),nodes.Get(0),Ipv4Address("172.16.1.2"),routingStream);
 
 
    // CheckPath(c.Get(0),intermediateNodes1,pathToCheck1);
@@ -1480,16 +1515,14 @@ GlobalRoutingProtocolTestCase::DoRun()
     pathToCheck2.emplace_back("10.250.1.4");
 
     std::vector<Ptr<Node>> intermediateNodes2;
-    intermediateNodes2.push_back(c.Get(2));
-    intermediateNodes2.push_back(c.Get(5));
+    intermediateNodes2.push_back(nodes.Get(2));
+    intermediateNodes2.push_back(nodes.Get(5));
 
-    CheckPath(c.Get(1) ,intermediateNodes2,pathToCheck2);
+    CheckPath(nodes.Get(1) ,intermediateNodes2,pathToCheck2);
 
 
     //test 3:check path from n1 to n8
-    Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper>(&std::cout);
-    Ipv4GlobalRoutingHelper::PrintRoutingTableAt(Seconds(2),c.Get(7),routingStream);
-    Ipv4GlobalRoutingHelper::PrintRoutingPathAt(Seconds(2),c.Get(1),Ipv4Address("10.1.5.2"),routingStream);
+ 
   
     
 
