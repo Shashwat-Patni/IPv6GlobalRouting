@@ -104,7 +104,7 @@ class SPFVertex
      * @see GlobalRoutingLSA
      * @param lsa The Link State Advertisement used for finding initial values.
      */
-    SPFVertex(GlobalRoutingLSA* lsa);
+    SPFVertex(GlobalRoutingLSA<Ipv4Manager>* lsa);
 
     /**
      * @brief Destroy an SPFVertex (Shortest Path First Vertex).
@@ -183,7 +183,7 @@ class SPFVertex
      * @returns A pointer to the GlobalRoutingLSA found by the router represented
      * by this SPFVertex object.
      */
-    GlobalRoutingLSA* GetLSA() const;
+    GlobalRoutingLSA<Ipv4Manager>* GetLSA() const;
 
     /**
      * @brief Set the Global Router Link State Advertisement returned by the
@@ -198,7 +198,7 @@ class SPFVertex
      * must not delete the LSA after calling this method.
      * @param lsa A pointer to the GlobalRoutingLSA.
      */
-    void SetLSA(GlobalRoutingLSA* lsa);
+    void SetLSA(GlobalRoutingLSA<Ipv4Manager>* lsa);
 
     /**
      * @brief Get the distance from the root vertex to "this" SPFVertex object.
@@ -526,7 +526,7 @@ class SPFVertex
   private:
     VertexType m_vertexType;                        //!< Vertex type
     Ipv4Address m_vertexId;                         //!< Vertex ID
-    GlobalRoutingLSA* m_lsa;                        //!< Link State Advertisement
+    GlobalRoutingLSA<Ipv4Manager>* m_lsa;           //!< Link State Advertisement
     uint32_t m_distanceFromRoot;                    //!< Distance from root node
     int32_t m_rootOif;                              //!< root Output Interface
     Ipv4Address m_nextHop;                          //!< next hop
@@ -598,7 +598,7 @@ class GlobalRouteManagerLSDB
      * ID.
      * @param lsa A pointer to the Link State Advertisement for the router.
      */
-    void Insert(Ipv4Address addr, GlobalRoutingLSA* lsa);
+    void Insert(Ipv4Address addr, GlobalRoutingLSA<Ipv4Manager>* lsa);
 
     /**
      * @brief Look up the Link State Advertisement associated with the given
@@ -614,7 +614,7 @@ class GlobalRouteManagerLSDB
      * @returns A pointer to the Link State Advertisement for the router specified
      * by the IP address addr.
      */
-    GlobalRoutingLSA* GetLSA(Ipv4Address addr) const;
+    GlobalRoutingLSA<Ipv4Manager>* GetLSA(Ipv4Address addr) const;
     /**
      * @brief Look up the Link State Advertisement associated with the given
      * link state ID (address).  This is a variation of the GetLSA call
@@ -627,7 +627,7 @@ class GlobalRouteManagerLSDB
      * by the IP address addr.
      * ID.
      */
-    GlobalRoutingLSA* GetLSAByLinkData(Ipv4Address addr) const;
+    GlobalRoutingLSA<Ipv4Manager>* GetLSAByLinkData(Ipv4Address addr) const;
 
     /**
      * @brief Set all LSA flags to an initialized state, for SPF computation
@@ -653,7 +653,7 @@ class GlobalRouteManagerLSDB
      * @param index the index associated with the LSA.
      * @returns A pointer to the Link State Advertisement.
      */
-    GlobalRoutingLSA* GetExtLSA(uint32_t index) const;
+    GlobalRoutingLSA<Ipv4Manager>* GetExtLSA(uint32_t index) const;
     /**
      * @brief Get the number of External Link State Advertisements.
      *
@@ -663,13 +663,13 @@ class GlobalRouteManagerLSDB
     uint32_t GetNumExtLSAs() const;
 
   private:
-    typedef std::map<Ipv4Address, GlobalRoutingLSA*>
+    typedef std::map<Ipv4Address, GlobalRoutingLSA<Ipv4Manager>*>
         LSDBMap_t; //!< container of IPv4 addresses / Link State Advertisements
-    typedef std::pair<Ipv4Address, GlobalRoutingLSA*>
+    typedef std::pair<Ipv4Address, GlobalRoutingLSA<Ipv4Manager>*>
         LSDBPair_t; //!< pair of IPv4 addresses / Link State Advertisements
 
     LSDBMap_t m_database; //!< database of IPv4 addresses / Link State Advertisements
-    std::vector<GlobalRoutingLSA*>
+    std::vector<GlobalRoutingLSA<Ipv4Manager>*>
         m_extdatabase; //!< database of External Link State Advertisements
 };
 
@@ -788,7 +788,7 @@ class GlobalRouteManagerImpl
      * @param v vertex to be processed
      * @param extlsa external LSA
      */
-    void ProcessASExternals(SPFVertex* v, GlobalRoutingLSA* extlsa);
+    void ProcessASExternals(SPFVertex* v, GlobalRoutingLSA<Ipv4Manager>* extlsa);
 
     /**
      * @brief Examine the links in v's LSA and update the list of candidates with any
@@ -828,7 +828,7 @@ class GlobalRouteManagerImpl
      */
     int SPFNexthopCalculation(SPFVertex* v,
                               SPFVertex* w,
-                              GlobalRoutingLinkRecord* l,
+                              GlobalRoutingLinkRecord<Ipv4Manager>* l,
                               uint32_t distance);
 
     /**
@@ -866,9 +866,10 @@ class GlobalRouteManagerImpl
      * @param prev_link the previous link in the list
      * @returns the link's record
      */
-    GlobalRoutingLinkRecord* SPFGetNextLink(SPFVertex* v,
-                                            SPFVertex* w,
-                                            GlobalRoutingLinkRecord* prev_link);
+    GlobalRoutingLinkRecord<Ipv4Manager>* SPFGetNextLink(
+        SPFVertex* v,
+        SPFVertex* w,
+        GlobalRoutingLinkRecord<Ipv4Manager>* prev_link);
 
     /**
      * @brief Add a host route to the routing tables
@@ -907,7 +908,7 @@ class GlobalRouteManagerImpl
      * @param l the global routing link record
      * @param v the vertex
      */
-    void SPFIntraAddStub(GlobalRoutingLinkRecord* l, SPFVertex* v);
+    void SPFIntraAddStub(GlobalRoutingLinkRecord<Ipv4Manager>* l, SPFVertex* v);
 
     /**
      * @brief Add an external route to the routing tables
@@ -915,7 +916,7 @@ class GlobalRouteManagerImpl
      * @param extlsa the external LSA
      * @param v the vertex
      */
-    void SPFAddASExternal(GlobalRoutingLSA* extlsa, SPFVertex* v);
+    void SPFAddASExternal(GlobalRoutingLSA<Ipv4Manager>* extlsa, SPFVertex* v);
 
     /**
      * @brief Return the interface number corresponding to a given IP address and mask

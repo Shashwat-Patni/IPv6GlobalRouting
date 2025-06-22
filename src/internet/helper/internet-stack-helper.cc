@@ -215,7 +215,7 @@ InternetStackHelper::AssignStreams(NodeContainer c, int64_t stream)
     for (auto i = c.Begin(); i != c.End(); ++i)
     {
         Ptr<Node> node = *i;
-        Ptr<GlobalRouter> router = node->GetObject<GlobalRouter>();
+        Ptr<GlobalRouter<Ipv4Manager>> router = node->GetObject<GlobalRouter<Ipv4Manager>>();
         if (router)
         {
             Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol();
