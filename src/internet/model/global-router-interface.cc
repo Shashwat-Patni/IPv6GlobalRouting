@@ -1863,9 +1863,16 @@ GlobalRouter<T, Enable>::MarkBridgeAsVisited(Ptr<BridgeNetDevice> bridgeNetDevic
 }
 
 /**Explicit initialize the template classes */
+/**
+ * @brief Stream insertion operator.
+ *
+ * @param os the reference to the output stream
+ * @param lsa the LSA
+ * @returns the reference to the output stream
+ */
+template std::ostream& operator<< <Ipv4Manager>(std::ostream&, GlobalRoutingLSA<Ipv4Manager>&);
 template class GlobalRoutingLinkRecord<Ipv4Manager>;
 template class GlobalRoutingLSA<Ipv4Manager>;
-template std::ostream& operator<< <Ipv4Manager>(std::ostream&, GlobalRoutingLSA<Ipv4Manager>&);
 NS_OBJECT_TEMPLATE_CLASS_DEFINE(GlobalRouter, Ipv4Manager);
 
 } // namespace ns3
