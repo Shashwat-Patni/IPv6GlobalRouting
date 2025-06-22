@@ -1864,29 +1864,9 @@ GlobalRouter<T, Enable>::MarkBridgeAsVisited(Ptr<BridgeNetDevice> bridgeNetDevic
     m_bridgesVisited.push_back(bridgeNetDevice);
 }
 
-template uint32_t GlobalRoutingLSA<Ipv4Manager>::GetNLinkRecords() const;
-template GlobalRoutingLinkRecord<Ipv4Manager>* GlobalRoutingLSA<Ipv4Manager>::GetLinkRecord(
-    uint32_t n) const;
-template uint32_t GlobalRoutingLSA<Ipv4Manager>::AddAttachedRouter(IpAddress addr);
-template GlobalRoutingLSA<Ipv4Manager>::SPFStatus GlobalRoutingLSA<Ipv4Manager>::GetStatus() const;
-template uint32_t GlobalRoutingLSA<Ipv4Manager>::GetNAttachedRouters() const;
-template GlobalRoutingLSA<Ipv4Manager>::IpMaskOrPrefix GlobalRoutingLSA<
-    Ipv4Manager>::GetNetworkLSANetworkMask() const;
-template void GlobalRoutingLSA<Ipv4Manager>::SetLinkStateId(IpAddress addr);
-template GlobalRoutingLSA<Ipv4Manager>::IpAddress GlobalRoutingLSA<Ipv4Manager>::GetLinkStateId()
-    const;
+/**Explicit initialize the template classes */
+template class GlobalRoutingLSA<Ipv4Manager>;
 template std::ostream& operator<< <Ipv4Manager>(std::ostream&, GlobalRoutingLSA<Ipv4Manager>&);
-template Ptr<Node> GlobalRoutingLSA<Ipv4Manager>::GetNode() const;
-template GlobalRoutingLSA<Ipv4Manager>::LSType GlobalRoutingLSA<Ipv4Manager>::GetLSType() const;
-template GlobalRoutingLSA<Ipv4Manager>::IpAddress GlobalRoutingLSA<
-    Ipv4Manager>::GetAdvertisingRouter() const;
-template GlobalRoutingLSA<Ipv4Manager>::IpAddress GlobalRoutingLSA<Ipv4Manager>::GetAttachedRouter(
-    uint32_t n) const;
-template uint32_t GlobalRoutingLSA<Ipv4Manager>::AddLinkRecord(
-    GlobalRoutingLinkRecord<Ipv4Manager>* lr);
-template ns3::GlobalRoutingLinkRecord<ns3::Ipv4Manager, void>::GlobalRoutingLinkRecord(
-    ns3::GlobalRoutingLinkRecord<ns3::Ipv4Manager, void>::LinkType,
-    ns3::Ipv4Address,
-    ns3::Ipv4Address,
-    uint16_t);
+template class GlobalRoutingLinkRecord<Ipv4Manager>;
+
 } // namespace ns3
