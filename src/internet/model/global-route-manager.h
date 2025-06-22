@@ -56,6 +56,9 @@ class GlobalRouteManager
     /// Alias for Ipv4Address and Ipv6Address classes
     using IpAddress = typename std::conditional_t<IsIpv4, Ipv4Address, Ipv6Address>;
 
+    /// Alias for Ipv4Manager and Ipv6Manager classes
+    using IpManager = typename std::conditional_t<IsIpv4, Ipv4Manager, Ipv6Manager>;
+
   public:
     // Delete copy constructor and assignment operator to avoid misuse
     GlobalRouteManager(const GlobalRouteManager<T>&) = delete;
