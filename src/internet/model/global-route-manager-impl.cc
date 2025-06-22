@@ -2527,6 +2527,7 @@ GlobalRouteManagerImpl<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
     (*os).copyfmt(oldState);
 }
 
+template class GlobalRouteManagerLSDB<Ipv4Manager>;
 template class ns3::GlobalRouteManagerImpl<ns3::Ipv4Manager>;
 
 } // namespace ns3
