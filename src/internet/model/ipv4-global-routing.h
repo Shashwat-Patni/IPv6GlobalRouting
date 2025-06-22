@@ -29,6 +29,7 @@ class Ipv4Header;
 class Ipv4RoutingTableEntry;
 class Ipv4MulticastRoutingTableEntry;
 class Node;
+template <typename, typename>
 class GlobalRouteManagerImpl;
 
 /**
@@ -60,6 +61,7 @@ class GlobalRouteManagerImpl;
  */
 class Ipv4GlobalRouting : public Ipv4RoutingProtocol
 {
+    template <typename, typename>
     friend class GlobalRouteManagerImpl;
 
   public:

@@ -330,7 +330,7 @@ LinkRoutesTestCase::DoRun()
     BuildLsa();
 
     // Test the database
-    auto srmlsdb = new GlobalRouteManagerLSDB();
+    auto srmlsdb = new GlobalRouteManagerLSDB<Ipv4Manager>();
     srmlsdb->Insert(m_lsas[0]->GetLinkStateId(), m_lsas[0]);
     srmlsdb->Insert(m_lsas[1]->GetLinkStateId(), m_lsas[1]);
     srmlsdb->Insert(m_lsas[2]->GetLinkStateId(), m_lsas[2]);
@@ -345,7 +345,7 @@ LinkRoutesTestCase::DoRun()
                                                                // the right key
 
     // next, calculate routes based on the manually created LSDB
-    auto srm = new GlobalRouteManagerImpl();
+    auto srm = new GlobalRouteManagerImpl<Ipv4Manager>();
     srm->DebugUseLsdb(srmlsdb); // manually add in an LSDB
 
     srm->DebugSPFCalculate(m_lsas[0]->GetLinkStateId()); // fill routing table for node n0
@@ -554,7 +554,7 @@ LanRoutesTestCase::DoRun()
 {
     BuildLsa();
     // insert the LSAs into the GlobalRouteManagerLSDB
-    auto srmlsdb = new GlobalRouteManagerLSDB();
+    auto srmlsdb = new GlobalRouteManagerLSDB<Ipv4Manager>();
 
     srmlsdb->Insert(m_lsas[0]->GetLinkStateId(), m_lsas[0]);
     srmlsdb->Insert(m_lsas[1]->GetLinkStateId(), m_lsas[1]);
@@ -562,7 +562,7 @@ LanRoutesTestCase::DoRun()
     srmlsdb->Insert(m_lsas[3]->GetLinkStateId(), m_lsas[3]);
 
     // create the GlobalRouteManagerImpl
-    auto srm = new GlobalRouteManagerImpl();
+    auto srm = new GlobalRouteManagerImpl<Ipv4Manager>();
     srm->DebugUseLsdb(srmlsdb);
 
     srm->DebugSPFCalculate(m_lsas[0]->GetLinkStateId()); // fill the routing table for node 0
@@ -892,14 +892,14 @@ RandomEcmpTestCase::DoRun()
     BuildLsa();
 
     // insert the LSAs into the GlobalRouteManagerLSDB
-    auto srmlsdb = new GlobalRouteManagerLSDB();
+    auto srmlsdb = new GlobalRouteManagerLSDB<Ipv4Manager>();
     srmlsdb->Insert(m_lsas[0]->GetLinkStateId(), m_lsas[0]);
     srmlsdb->Insert(m_lsas[1]->GetLinkStateId(), m_lsas[1]);
     srmlsdb->Insert(m_lsas[2]->GetLinkStateId(), m_lsas[2]);
     srmlsdb->Insert(m_lsas[3]->GetLinkStateId(), m_lsas[3]);
 
     // create the GlobalRouteManagerImpl
-    auto srm = new GlobalRouteManagerImpl();
+    auto srm = new GlobalRouteManagerImpl<Ipv4Manager>();
     srm->DebugUseLsdb(srmlsdb);
 
     // we manually call the DebugSPFCalculate to fill the routing tables for node 0
