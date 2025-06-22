@@ -1317,6 +1317,7 @@ class GlobalRoutingProtocolTestCase : public TestCase
      * @brief Callback function for RouteInput() API of GlobalRoutingProtocol.
      * @param packet Packet to be locally delivered
      * @param header IPv4 header of the packet
+     * @param iif Interface index
      */
     void MyLocalDeliverCallback(Ptr<const Packet> packet, const Ipv4Header& header, uint32_t iif);
     /**
