@@ -1863,6 +1863,7 @@ GlobalRouter<T, Enable>::MarkBridgeAsVisited(Ptr<BridgeNetDevice> bridgeNetDevic
 }
 
 /**Explicit initialize the template classes */
+template class GlobalRoutingLinkRecord<Ipv4Manager>;
 template class GlobalRoutingLSA<Ipv4Manager>;
 template std::ostream& operator<< <Ipv4Manager>(std::ostream&, GlobalRoutingLSA<Ipv4Manager>&);
 NS_OBJECT_TEMPLATE_CLASS_DEFINE(GlobalRouter, Ipv4Manager);
