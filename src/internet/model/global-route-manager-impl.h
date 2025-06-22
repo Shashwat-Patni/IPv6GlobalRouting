@@ -525,11 +525,14 @@ class SPFVertex
 
   private:
     VertexType m_vertexType;                        //!< Vertex type
-    Ipv4Address m_vertexId;                         //!< Vertex ID
-    GlobalRoutingLSA<Ipv4Manager>* m_lsa;           //!< Link State Advertisement
+    Ipv4Address m_v4VertexId;                       //!< Vertex ID
+    Ipv6Address m_v6VertexId;                       //!< Vertex ID
+    GlobalRoutingLSA<Ipv4Manager>* m_v4Lsa;         //!< Link State Advertisement
+    GlobalRoutingLSA<Ipv6Manager>* m_v6Lsa;         //!< Link State Advertisement
     uint32_t m_distanceFromRoot;                    //!< Distance from root node
     int32_t m_rootOif;                              //!< root Output Interface
-    Ipv4Address m_nextHop;                          //!< next hop
+    Ipv4Address m_v4NextHop;                        //!< next hop
+    Ipv6Address m_v6NextHop;                        //!< next hop
     typedef std::list<NodeExit_t> ListOfNodeExit_t; //!< container of Exit nodes
     ListOfNodeExit_t m_ecmpRootExits; //!< store the multiple root's exits for supporting ECMP
     typedef std::list<SPFVertex*> ListOfSPFVertex_t; //!< container of SPFVertex items

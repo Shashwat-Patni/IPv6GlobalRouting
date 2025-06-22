@@ -56,7 +56,7 @@ operator<<(std::ostream& os, const SPFVertex::ListOfSPFVertex_t& vs)
     os << "{";
     for (auto iter = vs.begin(); iter != vs.end();)
     {
-        os << (*iter)->m_vertexId;
+        os << (*iter)->m_v4VertexId;
         if (++iter != vs.end())
         {
             os << ", ";
@@ -78,11 +78,11 @@ operator<<(std::ostream& os, const SPFVertex::ListOfSPFVertex_t& vs)
 
 SPFVertex::SPFVertex()
     : m_vertexType(VertexUnknown),
-      m_vertexId("255.255.255.255"),
-      m_lsa(nullptr),
+      m_v4VertexId("255.255.255.255"),
+      m_v4Lsa(nullptr),
       m_distanceFromRoot(SPF_INFINITY),
       m_rootOif(SPF_INFINITY),
-      m_nextHop("0.0.0.0"),
+      m_v4NextHop("0.0.0.0"),
       m_parents(),
       m_children(),
       m_vertexProcessed(false)
@@ -91,11 +91,11 @@ SPFVertex::SPFVertex()
 }
 
 SPFVertex::SPFVertex(GlobalRoutingLSA<Ipv4Manager>* lsa)
-    : m_vertexId(lsa->GetLinkStateId()),
-      m_lsa(lsa),
+    : m_v4VertexId(lsa->GetLinkStateId()),
+      m_v4Lsa(lsa),
       m_distanceFromRoot(SPF_INFINITY),
       m_rootOif(SPF_INFINITY),
-      m_nextHop(Ipv4Address::GetZero()),
+      m_v4NextHop(Ipv4Address::GetZero()),
       m_parents(),
       m_children(),
       m_vertexProcessed(false)
@@ -152,7 +152,7 @@ SPFVertex::~SPFVertex()
         {
             continue;
         }
-        NS_LOG_LOGIC("Parent vertex-" << m_vertexId << " deleting its child vertex-"
+        NS_LOG_LOGIC("Parent vertex-" << m_v4VertexId << " deleting its child vertex-"
                                       << p->GetVertexId());
         delete p;
         p = nullptr;
@@ -163,7 +163,7 @@ SPFVertex::~SPFVertex()
     // delete root exit direction
     m_ecmpRootExits.clear();
 
-    NS_LOG_LOGIC("Vertex-" << m_vertexId << " completed deleted");
+    NS_LOG_LOGIC("Vertex-" << m_v4VertexId << " completed deleted");
 }
 
 void
@@ -184,28 +184,28 @@ void
 SPFVertex::SetVertexId(Ipv4Address id)
 {
     NS_LOG_FUNCTION(this << id);
-    m_vertexId = id;
+    m_v4VertexId = id;
 }
 
 Ipv4Address
 SPFVertex::GetVertexId() const
 {
     NS_LOG_FUNCTION(this);
-    return m_vertexId;
+    return m_v4VertexId;
 }
 
 void
 SPFVertex::SetLSA(GlobalRoutingLSA<Ipv4Manager>* lsa)
 {
     NS_LOG_FUNCTION(this << lsa);
-    m_lsa = lsa;
+    m_v4Lsa = lsa;
 }
 
 GlobalRoutingLSA<Ipv4Manager>*
 SPFVertex::GetLSA() const
 {
     NS_LOG_FUNCTION(this);
-    return m_lsa;
+    return m_v4Lsa;
 }
 
 void
@@ -275,7 +275,7 @@ SPFVertex::SetRootExitDirection(Ipv4Address nextHop, int32_t id)
     m_ecmpRootExits.emplace_back(nextHop, id);
     // update the following in order to be backward compatible with
     // GetNextHop and GetOutgoingInterface methods
-    m_nextHop = nextHop;
+    m_v4NextHop = nextHop;
     m_rootOif = id;
 }
 
