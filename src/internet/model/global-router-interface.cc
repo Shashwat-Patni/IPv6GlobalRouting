@@ -524,8 +524,6 @@ operator<<(std::ostream& os, GlobalRoutingLSA<T, Enable>& lsa)
 //
 // ---------------------------------------------------------------------------
 
-NS_OBJECT_TEMPLATE_CLASS_DEFINE(GlobalRouter, Ipv4Manager);
-
 template <typename T, typename Enable>
 TypeId
 GlobalRouter<T, Enable>::GetTypeId()
@@ -1867,6 +1865,6 @@ GlobalRouter<T, Enable>::MarkBridgeAsVisited(Ptr<BridgeNetDevice> bridgeNetDevic
 /**Explicit initialize the template classes */
 template class GlobalRoutingLSA<Ipv4Manager>;
 template std::ostream& operator<< <Ipv4Manager>(std::ostream&, GlobalRoutingLSA<Ipv4Manager>&);
-template class GlobalRoutingLinkRecord<Ipv4Manager>;
+NS_OBJECT_TEMPLATE_CLASS_DEFINE(GlobalRouter, Ipv4Manager);
 
 } // namespace ns3
