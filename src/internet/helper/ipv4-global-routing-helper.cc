@@ -36,7 +36,7 @@ Ipv4GlobalRoutingHelper::Create(Ptr<Node> node) const
 {
     NS_LOG_LOGIC("Adding GlobalRouter interface to node " << node->GetId());
 
-    Ptr<GlobalRouter> globalRouter = CreateObject<GlobalRouter>();
+    Ptr<GlobalRouter<Ipv4Manager>> globalRouter = CreateObject<GlobalRouter<Ipv4Manager>>();
     node->AggregateObject(globalRouter);
 
     NS_LOG_LOGIC("Adding GlobalRouting Protocol to node " << node->GetId());
