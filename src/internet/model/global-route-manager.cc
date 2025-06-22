@@ -78,8 +78,8 @@ GlobalRouteManager<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
 }
 
 template <typename T, typename Enable>
-uint32_t GlobalRouteManager<T, Enable>::routerId = 0;
+uint32_t GlobalRouteManager<T, Enable>::routerId = 0; //!< Router ID counter
 
-template class ns3::GlobalRouteManager<ns3::Ipv4Manager>; //!< Router ID counter
+template class ns3::GlobalRouteManager<ns3::Ipv4Manager>; 
 
 } // namespace ns3
