@@ -88,7 +88,7 @@ class LinkRoutesTestCase : public TestCase
      * @param dests The expected destinations.
      * @param gws The expected gateways.
      */
-    void CheckRoutes(Ptr<Ipv4GlobalRouting>& globalroutingprotocol,
+    void CheckRoutes(Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>>& globalroutingprotocol,
                      std::vector<Ipv4Address>& dests,
                      std::vector<Ipv4Address>& gws);
 
@@ -102,7 +102,7 @@ LinkRoutesTestCase::LinkRoutesTestCase()
 }
 
 void
-LinkRoutesTestCase::CheckRoutes(Ptr<Ipv4GlobalRouting>& globalroutingprotocol,
+LinkRoutesTestCase::CheckRoutes(Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>>& globalroutingprotocol,
                                 std::vector<Ipv4Address>& dests,
                                 std::vector<Ipv4Address>& gws)
 {
@@ -367,7 +367,8 @@ LinkRoutesTestCase::DoRun()
     NS_TEST_ASSERT_MSG_NE(ip0, nullptr, "Error-- no Ipv4 object at node 0");
     Ptr<Ipv4RoutingProtocol> routing0 = ip0->GetRoutingProtocol();
     NS_TEST_ASSERT_MSG_NE(routing0, nullptr, "Error-- no Ipv4 routing protocol object at node 0");
-    Ptr<Ipv4GlobalRouting> globalRouting0 = routing0->GetObject<Ipv4GlobalRouting>();
+    Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>> globalRouting0 =
+        routing0->GetObject<Ipv4GlobalRouting<Ipv4RoutingProtocol>>();
     NS_TEST_ASSERT_MSG_NE(globalRouting0, nullptr, "Error-- no Ipv4GlobalRouting object at node 0");
 
     // Check that the right number of entries are in the routing table
@@ -387,7 +388,8 @@ LinkRoutesTestCase::DoRun()
     NS_TEST_ASSERT_MSG_NE(ip2, nullptr, "Error-- no Ipv4 object at node 2");
     Ptr<Ipv4RoutingProtocol> routing2 = ip2->GetRoutingProtocol();
     NS_TEST_ASSERT_MSG_NE(routing2, nullptr, "Error-- no Ipv4 routing protocol object at node 2");
-    Ptr<Ipv4GlobalRouting> globalRouting2 = routing2->GetObject<Ipv4GlobalRouting>();
+    Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>> globalRouting2 =
+        routing2->GetObject<Ipv4GlobalRouting<Ipv4RoutingProtocol>>();
     NS_TEST_ASSERT_MSG_NE(globalRouting2, nullptr, "Error-- no Ipv4GlobalRouting object at node 2");
 
     // check that the correct number of routes were built
@@ -573,7 +575,8 @@ LanRoutesTestCase::DoRun()
     NS_TEST_ASSERT_MSG_NE(ip0, nullptr, "Error-- no Ipv4 object at node 0");
     Ptr<Ipv4RoutingProtocol> routing0 = ip0->GetRoutingProtocol();
     NS_TEST_ASSERT_MSG_NE(routing0, nullptr, "Error-- no Ipv4 routing protocol object at node 0");
-    Ptr<Ipv4GlobalRouting> globalRouting0 = routing0->GetObject<Ipv4GlobalRouting>();
+    Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>> globalRouting0 =
+        routing0->GetObject<Ipv4GlobalRouting<Ipv4RoutingProtocol>>();
     NS_TEST_ASSERT_MSG_NE(globalRouting0, nullptr, "Error-- no Ipv4GlobalRouting object at node 0");
 
     // The only route to check is the network route
@@ -631,7 +634,7 @@ class RandomEcmpTestCase : public TestCase
      * @param dests The expected destinations.
      * @param gws The expected gateways.
      */
-    void CheckRoutes(Ptr<Ipv4GlobalRouting>& globalroutingprotocol,
+    void CheckRoutes(Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>>& globalroutingprotocol,
                      std::vector<Ipv4Address>& dests,
                      std::vector<Ipv4Address>& gws);
     uint32_t route1 = 0; //!< Counter to keep track of the number of times route1 is used
@@ -706,7 +709,7 @@ RandomEcmpTestCase::DoSetup()
 }
 
 void
-RandomEcmpTestCase::CheckRoutes(Ptr<Ipv4GlobalRouting>& globalroutingprotocol,
+RandomEcmpTestCase::CheckRoutes(Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>>& globalroutingprotocol,
                                 std::vector<Ipv4Address>& dests,
                                 std::vector<Ipv4Address>& gws)
 {
@@ -911,7 +914,8 @@ RandomEcmpTestCase::DoRun()
     NS_TEST_ASSERT_MSG_NE(ip0, nullptr, "Error-- no Ipv4 object at node 0");
     Ptr<Ipv4RoutingProtocol> routing0 = ip0->GetRoutingProtocol();
     NS_TEST_ASSERT_MSG_NE(routing0, nullptr, "Error-- no Ipv4 routing protocol object at node 0");
-    Ptr<Ipv4GlobalRouting> globalRouting0 = routing0->GetObject<Ipv4GlobalRouting>();
+    Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>> globalRouting0 =
+        routing0->GetObject<Ipv4GlobalRouting<Ipv4RoutingProtocol>>();
     NS_TEST_ASSERT_MSG_NE(globalRouting0, nullptr, "Error-- no Ipv4GlobalRouting object at node 0");
 
     // assign streams to the UniformRandomVariable

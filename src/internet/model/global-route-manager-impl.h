@@ -12,7 +12,9 @@
 
 #include "global-router-interface.h"
 #include "ipv4-l3-protocol.h"
+#include "ipv4-routing-protocol.h"
 #include "ipv6-l3-protocol.h"
+#include "ipv6-routing-protocol.h"
 
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv4-routing-helper.h"
@@ -31,6 +33,7 @@ namespace ns3
 const uint32_t SPF_INFINITY = 0xffffffff; //!< "infinite" distance between nodes
 
 class CandidateQueue;
+template <typename>
 class Ipv4GlobalRouting;
 
 /**
@@ -763,6 +766,10 @@ class GlobalRouteManagerImpl
 
     /// Alias for Ipv4l3Protocol and Ipv6l3Protocol classes
     using IpL3Protocol = typename std::conditional_t<IsIpv4, Ipv4L3Protocol, Ipv6L3Protocol>;
+
+    /// Alias for Ipv4RoutingProtocol and Ipv6RoutingProtocol classes
+    using IpRoutingProtocol =
+        typename std::conditional_t<IsIpv4, Ipv4RoutingProtocol, Ipv6RoutingProtocol>;
 
   public:
     GlobalRouteManagerImpl();

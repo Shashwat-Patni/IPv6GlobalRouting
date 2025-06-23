@@ -40,7 +40,8 @@ Ipv4GlobalRoutingHelper::Create(Ptr<Node> node) const
     node->AggregateObject(globalRouter);
 
     NS_LOG_LOGIC("Adding GlobalRouting Protocol to node " << node->GetId());
-    Ptr<Ipv4GlobalRouting> globalRouting = CreateObject<Ipv4GlobalRouting>();
+    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> globalRouting =
+        CreateObject<Ipv4GlobalRouting<IpRoutingProtocol>>();
     globalRouter->SetRoutingProtocol(globalRouting);
 
     return globalRouting;

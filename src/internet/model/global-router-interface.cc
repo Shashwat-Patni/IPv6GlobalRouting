@@ -549,14 +549,14 @@ GlobalRouter<T, Enable>::~GlobalRouter()
 
 template <typename T, typename Enable>
 void
-GlobalRouter<T, Enable>::SetRoutingProtocol(Ptr<Ipv4GlobalRouting> routing)
+GlobalRouter<T, Enable>::SetRoutingProtocol(Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> routing)
 {
     NS_LOG_FUNCTION(this << routing);
     m_routingProtocol = routing;
 }
 
 template <typename T, typename Enable>
-Ptr<Ipv4GlobalRouting>
+Ptr<Ipv4GlobalRouting<typename GlobalRouter<T, Enable>::IpRoutingProtocol>>
 GlobalRouter<T, Enable>::GetRoutingProtocol()
 {
     NS_LOG_FUNCTION(this);
