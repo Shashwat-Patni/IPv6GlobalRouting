@@ -34,7 +34,7 @@ namespace ns3
 template <typename T, typename Enable>
 class GlobalRouter;
 template <typename>
-class Ipv4GlobalRouting;
+class GlobalRouting;
 
 /**
  * @ingroup globalrouting
@@ -711,13 +711,13 @@ class GlobalRouter : public Object
      * @brief Set the specific Global Routing Protocol to be used
      * @param routing the routing protocol
      */
-    void SetRoutingProtocol(Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> routing);
+    void SetRoutingProtocol(Ptr<GlobalRouting<IpRoutingProtocol>> routing);
 
     /**
      * @brief Get the specific Global Routing Protocol used
      * @returns the routing protocol
      */
-    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> GetRoutingProtocol();
+    Ptr<GlobalRouting<IpRoutingProtocol>> GetRoutingProtocol();
 
     /**
      * @brief Get the Router ID associated with this Global Router.
@@ -955,8 +955,8 @@ class GlobalRouter : public Object
         ListOfLSAs_t;    //!< container for the GlobalRoutingLSAs
     ListOfLSAs_t m_LSAs; //!< database of GlobalRoutingLSAs
 
-    IpAddress m_routerId;                                        //!< router ID (its IPv4 address)
-    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> m_routingProtocol; //!< the Ipv4GlobalRouting in use
+    IpAddress m_routerId;                                    //!< router ID (its IPv4 address)
+    Ptr<GlobalRouting<IpRoutingProtocol>> m_routingProtocol; //!< the Ipv4GlobalRouting in use
 
     typedef std::list<IpRoutingTableEntry*> InjectedRoutes; //!< container of Ipv4RoutingTableEntry
     typedef std::list<IpRoutingTableEntry*>::const_iterator

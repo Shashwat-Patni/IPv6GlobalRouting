@@ -218,7 +218,7 @@ InternetStackHelper::AssignStreams(NodeContainer c, int64_t stream)
         Ptr<GlobalRouter<Ipv4Manager>> router = node->GetObject<GlobalRouter<Ipv4Manager>>();
         if (router)
         {
-            Ptr<Ipv4GlobalRouting<Ipv4RoutingProtocol>> gr = router->GetRoutingProtocol();
+            Ptr<GlobalRouting<Ipv4RoutingProtocol>> gr = router->GetRoutingProtocol();
             if (gr)
             {
                 currentStream += gr->AssignStreams(currentStream);
