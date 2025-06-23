@@ -65,9 +65,9 @@ class GlobalRouteManagerImpl;
  * @see GlobalRouteManager
  */
 template <typename T>
-class Ipv4GlobalRouting : public std::enable_if_t<std::is_same_v<Ipv4RoutingProtocol, T> ||
-                                                      std::is_same_v<Ipv6RoutingProtocol, T>,
-                                                  T>
+class GlobalRouting : public std::enable_if_t<std::is_same_v<Ipv4RoutingProtocol, T> ||
+                                                  std::is_same_v<Ipv6RoutingProtocol, T>,
+                                              T>
 {
     template <typename, typename>
     friend class GlobalRouteManagerImpl;
@@ -116,8 +116,8 @@ class Ipv4GlobalRouting : public std::enable_if_t<std::is_same_v<Ipv4RoutingProt
      *
      * @see Ipv4GlobalRouting
      */
-    Ipv4GlobalRouting();
-    ~Ipv4GlobalRouting() override;
+    GlobalRouting();
+    ~GlobalRouting() override;
 
     // These methods inherited from base class
     Ptr<IpRoute> RouteOutput(Ptr<Packet> p,

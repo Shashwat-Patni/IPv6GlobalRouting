@@ -576,7 +576,7 @@ GlobalRouteManagerImpl<T, Enable>::DeleteGlobalRoutes()
         {
             continue;
         }
-        Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
+        Ptr<GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
         uint32_t j = 0;
         uint32_t nRoutes = gr->GetNRoutes();
         NS_LOG_LOGIC("Deleting " << gr->GetNRoutes() << " routes from node " << node->GetId());
@@ -637,7 +637,7 @@ GlobalRouteManagerImpl<T, Enable>::BuildGlobalRoutingDatabase()
         // DiscoverLSAs () will get zero as the number since no routes have been
         // found.
         //
-        Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> grouting = rtr->GetRoutingProtocol();
+        Ptr<GlobalRouting<IpRoutingProtocol>> grouting = rtr->GetRoutingProtocol();
         uint32_t numLSAs = rtr->DiscoverLSAs();
         NS_LOG_LOGIC("Found " << numLSAs << " LSAs");
 
@@ -1321,7 +1321,7 @@ GlobalRouteManagerImpl<T, Enable>::CheckForStubNode(IpAddress root)
                     Ptr<GlobalRouter<IpManager>> router =
                         rlsa->GetNode()->template GetObject<GlobalRouter<IpManager>>();
                     NS_ASSERT(router);
-                    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
+                    Ptr<GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
                     NS_ASSERT(gr);
                     gr->AddNetworkRouteTo(IpAddress::GetZero(),
                                           IpMaskOrPrefix::GetZero(),
@@ -1637,7 +1637,7 @@ GlobalRouteManagerImpl<T, Enable>::SPFAddASExternal(GlobalRoutingLSA<IpManager>*
         {
             continue;
         }
-        Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
+        Ptr<GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
         NS_ASSERT(gr);
         // walk through all next-hop-IPs and out-going-interfaces for reaching
         // the stub network gateway 'v' from the root node
@@ -1805,7 +1805,7 @@ GlobalRouteManagerImpl<T, Enable>::SPFIntraAddStub(GlobalRoutingLinkRecord<IpMan
             {
                 continue;
             }
-            Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
+            Ptr<GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
             NS_ASSERT(gr);
             // walk through all next-hop-IPs and out-going-interfaces for reaching
             // the stub network gateway 'v' from the root node
@@ -2039,7 +2039,7 @@ GlobalRouteManagerImpl<T, Enable>::SPFIntraAddRouter(SPFVertex* v)
             {
                 continue;
             }
-            Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
+            Ptr<GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
             NS_ASSERT(gr);
             // walk through all available exit directions due to ECMP,
             // and add host route for each of the exit direction toward
@@ -2147,7 +2147,7 @@ GlobalRouteManagerImpl<T, Enable>::SPFIntraAddTransit(SPFVertex* v)
             {
                 continue;
             }
-            Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
+            Ptr<GlobalRouting<IpRoutingProtocol>> gr = router->GetRoutingProtocol();
             NS_ASSERT(gr);
             // walk through all available exit directions due to ECMP,
             // and add host route for each of the exit direction toward
@@ -2291,8 +2291,8 @@ GlobalRouteManagerImpl<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
 
     // check if source node has either global Routing or if Listrouting and globalrouting in
     // Listrouting
-    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> globalRouting =
-        DynamicCast<Ipv4GlobalRouting<IpRoutingProtocol>>(ipv4->GetRoutingProtocol());
+    Ptr<GlobalRouting<IpRoutingProtocol>> globalRouting =
+        DynamicCast<GlobalRouting<IpRoutingProtocol>>(ipv4->GetRoutingProtocol());
 
     if (globalRouting == nullptr)
     {
@@ -2305,8 +2305,8 @@ GlobalRouteManagerImpl<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
             {
                 // Initialize priority
                 int16_t priority = 0;
-                Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> tempglobalRouting =
-                    DynamicCast<Ipv4GlobalRouting<IpRoutingProtocol>>(
+                Ptr<GlobalRouting<IpRoutingProtocol>> tempglobalRouting =
+                    DynamicCast<GlobalRouting<IpRoutingProtocol>>(
                         listRouting->GetRoutingProtocol(i, priority));
 
                 if (tempglobalRouting != nullptr)
@@ -2404,9 +2404,8 @@ GlobalRouteManagerImpl<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
 
         Ptr<Ip> ipv4currentnode = currentNode->GetObject<Ip>();
         uint32_t currentNodeID = currentNode->GetId();
-        Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> router =
-            DynamicCast<Ipv4GlobalRouting<IpRoutingProtocol>>(
-                ipv4currentnode->GetRoutingProtocol());
+        Ptr<GlobalRouting<IpRoutingProtocol>> router =
+            DynamicCast<GlobalRouting<IpRoutingProtocol>>(ipv4currentnode->GetRoutingProtocol());
         if (router == nullptr)
         {
             Ptr<IpListRouting> listRouter =
@@ -2419,8 +2418,8 @@ GlobalRouteManagerImpl<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
                 {
                     // Initialize priority
                     int16_t priority = 0;
-                    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> tempRouter =
-                        DynamicCast<Ipv4GlobalRouting<IpRoutingProtocol>>(
+                    Ptr<GlobalRouting<IpRoutingProtocol>> tempRouter =
+                        DynamicCast<GlobalRouting<IpRoutingProtocol>>(
                             listRouter->GetRoutingProtocol(i, priority));
                     if (tempRouter != nullptr)
                     {
