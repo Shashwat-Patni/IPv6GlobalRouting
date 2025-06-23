@@ -11,8 +11,10 @@
 #define GLOBAL_ROUTER_INTERFACE_H
 
 #include "global-route-manager.h"
+#include "ipv4-routing-protocol.h"
 #include "ipv4-routing-table-entry.h"
 #include "ipv6-l3-protocol.h"
+#include "ipv6-routing-protocol.h"
 #include "ipv6-routing-table-entry.h"
 #include "ipv6.h"
 
@@ -31,6 +33,7 @@ namespace ns3
 {
 template <typename T, typename Enable>
 class GlobalRouter;
+template <typename>
 class Ipv4GlobalRouting;
 
 /**
@@ -684,6 +687,10 @@ class GlobalRouter : public Object
     /// Alias for Ipv4Mask And Ipv6Prefix
     using IpMaskOrPrefix = typename std::conditional_t<IsIpv4, Ipv4Mask, Ipv6Prefix>;
 
+    /// Alias for Ipv4RoutingProtocol and Ipv6RoutingProtocol classes
+    using IpRoutingProtocol =
+        typename std::conditional_t<IsIpv4, Ipv4RoutingProtocol, Ipv6RoutingProtocol>;
+
   public:
     /**
      * @brief Get the type ID.
@@ -704,13 +711,13 @@ class GlobalRouter : public Object
      * @brief Set the specific Global Routing Protocol to be used
      * @param routing the routing protocol
      */
-    void SetRoutingProtocol(Ptr<Ipv4GlobalRouting> routing);
+    void SetRoutingProtocol(Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> routing);
 
     /**
      * @brief Get the specific Global Routing Protocol used
      * @returns the routing protocol
      */
-    Ptr<Ipv4GlobalRouting> GetRoutingProtocol();
+    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> GetRoutingProtocol();
 
     /**
      * @brief Get the Router ID associated with this Global Router.
@@ -948,8 +955,8 @@ class GlobalRouter : public Object
         ListOfLSAs_t;    //!< container for the GlobalRoutingLSAs
     ListOfLSAs_t m_LSAs; //!< database of GlobalRoutingLSAs
 
-    IpAddress m_routerId;                     //!< router ID (its IPv4 address)
-    Ptr<Ipv4GlobalRouting> m_routingProtocol; //!< the Ipv4GlobalRouting in use
+    IpAddress m_routerId;                                        //!< router ID (its IPv4 address)
+    Ptr<Ipv4GlobalRouting<IpRoutingProtocol>> m_routingProtocol; //!< the Ipv4GlobalRouting in use
 
     typedef std::list<IpRoutingTableEntry*> InjectedRoutes; //!< container of Ipv4RoutingTableEntry
     typedef std::list<IpRoutingTableEntry*>::const_iterator

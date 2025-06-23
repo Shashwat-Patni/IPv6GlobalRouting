@@ -7,11 +7,16 @@
 #ifndef IPV4_GLOBAL_ROUTING_H
 #define IPV4_GLOBAL_ROUTING_H
 
+#include "global-route-manager.h"
 #include "ipv4-header.h"
 #include "ipv4-routing-protocol.h"
 #include "ipv4.h"
+#include "ipv6-interface-address.h"
+#include "ipv6-routing-protocol.h"
+#include "ipv6-routing-table-entry.h"
 
 #include "ns3/ipv4-address.h"
+#include "ns3/ipv6-address.h"
 #include "ns3/ptr.h"
 #include "ns3/random-variable-stream.h"
 
@@ -59,10 +64,43 @@ class GlobalRouteManagerImpl;
  * @see Ipv4RoutingProtocol
  * @see GlobalRouteManager
  */
-class Ipv4GlobalRouting : public Ipv4RoutingProtocol
+template <typename T>
+class Ipv4GlobalRouting : public std::enable_if_t<std::is_same_v<Ipv4RoutingProtocol, T> ||
+                                                      std::is_same_v<Ipv6RoutingProtocol, T>,
+                                                  T>
 {
     template <typename, typename>
     friend class GlobalRouteManagerImpl;
+
+    /// Alias for determining whether the parent is Ipv4RoutingHelper or Ipv6RoutingHelper
+    static constexpr bool IsIpv4 = std::is_same_v<Ipv4RoutingProtocol, T>;
+    /// Alias for Ipv4 and Ipv6 classes
+    using Ip = typename std::conditional_t<IsIpv4, Ipv4, Ipv6>;
+    /// Alias for Ipv4Address and Ipv6Address classes
+    using IpAddress = typename std::conditional_t<IsIpv4, Ipv4Address, Ipv6Address>;
+    /// Alias for Ipv4RoutingProtocol and Ipv6RoutingProtocol classes
+    using IpRoutingProtocol =
+        typename std::conditional_t<IsIpv4, Ipv4RoutingProtocol, Ipv6RoutingProtocol>;
+
+    /// Alias for Ipv4Header and Ipv6Header classes
+    using IpHeader = typename std::conditional_t<IsIpv4, Ipv4Header, Ipv6Header>;
+
+    /// Alias for Ipv4Route and Ipv6Route classes
+    using IpRoute = typename std::conditional_t<IsIpv4, Ipv4Route, Ipv6Route>;
+
+    /// Alias for Ipv4Mask And Ipv6Prefix
+    using IpMaskOrPrefix = typename std::conditional_t<IsIpv4, Ipv4Mask, Ipv6Prefix>;
+
+    /// Alias for Ipv4RoutingTableEntry and Ipv6RoutingTableEntry classes
+    using IpRoutingTableEntry =
+        typename std::conditional_t<IsIpv4, Ipv4RoutingTableEntry, Ipv6RoutingTableEntry>;
+
+    /// Alias for Ipv4Manager and Ipv6Manager classes
+    using IpManager = typename std::conditional_t<IsIpv4, Ipv4Manager, Ipv6Manager>;
+
+    /// Alias for Ipv4InterfaceAddress and Ipv6InterfaceAddress classes
+    using IpInterfaceAddress =
+        typename std::conditional_t<IsIpv4, Ipv4InterfaceAddress, Ipv6InterfaceAddress>;
 
   public:
     /**
@@ -82,13 +120,48 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
     ~Ipv4GlobalRouting() override;
 
     // These methods inherited from base class
-    Ptr<Ipv4Route> RouteOutput(Ptr<Packet> p,
-                               const Ipv4Header& header,
-                               Ptr<NetDevice> oif,
-                               Socket::SocketErrno& sockerr) override;
+    Ptr<IpRoute> RouteOutput(Ptr<Packet> p,
+                             const IpHeader& header,
+                             Ptr<NetDevice> oif,
+                             Socket::SocketErrno& sockerr) override;
+
+    /// Callback for IPv4 unicast packets to be forwarded
+    typedef Callback<void, Ptr<IpRoute>, Ptr<const Packet>, const IpHeader&>
+        UnicastForwardCallbackv4;
+
+    /// Callback for IPv6 unicast packets to be forwarded
+    typedef Callback<void, Ptr<const NetDevice>, Ptr<IpRoute>, Ptr<const Packet>, const IpHeader&>
+        UnicastForwardCallbackv6;
+
+    /// Callback for unicast packets to be forwarded
+    typedef typename std::conditional_t<IsIpv4, UnicastForwardCallbackv4, UnicastForwardCallbackv6>
+        UnicastForwardCallback;
+
+    /// Callback for IPv4 multicast packets to be forwarded
+    typedef Callback<void, Ptr<Ipv4MulticastRoute>, Ptr<const Packet>, const IpHeader&>
+        MulticastForwardCallbackv4;
+
+    /// Callback for IPv6 multicast packets to be forwarded
+    typedef Callback<void,
+                     Ptr<const NetDevice>,
+                     Ptr<Ipv6MulticastRoute>,
+                     Ptr<const Packet>,
+                     const IpHeader&>
+        MulticastForwardCallbackv6;
+
+    /// Callback for multicast packets to be forwarded
+    typedef
+        typename std::conditional_t<IsIpv4, MulticastForwardCallbackv4, MulticastForwardCallbackv6>
+            MulticastForwardCallback;
+
+    /// Callback for packets to be locally delivered
+    typedef Callback<void, Ptr<const Packet>, const IpHeader&, uint32_t> LocalDeliverCallback;
+
+    /// Callback for routing errors (e.g., no route found)
+    typedef Callback<void, Ptr<const Packet>, const IpHeader&, Socket::SocketErrno> ErrorCallback;
 
     bool RouteInput(Ptr<const Packet> p,
-                    const Ipv4Header& header,
+                    const IpHeader& header,
                     Ptr<const NetDevice> idev,
                     const UnicastForwardCallback& ucb,
                     const MulticastForwardCallback& mcb,
@@ -96,9 +169,9 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
                     const ErrorCallback& ecb) override;
     void NotifyInterfaceUp(uint32_t interface) override;
     void NotifyInterfaceDown(uint32_t interface) override;
-    void NotifyAddAddress(uint32_t interface, Ipv4InterfaceAddress address) override;
-    void NotifyRemoveAddress(uint32_t interface, Ipv4InterfaceAddress address) override;
-    void SetIpv4(Ptr<Ipv4> ipv4) override;
+    void NotifyAddAddress(uint32_t interface, IpInterfaceAddress address) override;
+    void NotifyRemoveAddress(uint32_t interface, IpInterfaceAddress address) override;
+    void SetIpv4(Ptr<Ip> ipv4) override;
     void PrintRoutingTable(Ptr<OutputStreamWrapper> stream,
                            Time::Unit unit = Time::S) const override;
 
@@ -112,7 +185,7 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
      *
      * @see Ipv4Address
      */
-    void AddHostRouteTo(Ipv4Address dest, Ipv4Address nextHop, uint32_t interface);
+    void AddHostRouteTo(IpAddress dest, IpAddress nextHop, uint32_t interface);
     /**
      * @brief Add a host route to the global routing table.
      *
@@ -122,7 +195,7 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
      *
      * @see Ipv4Address
      */
-    void AddHostRouteTo(Ipv4Address dest, uint32_t interface);
+    void AddHostRouteTo(IpAddress dest, uint32_t interface);
 
     /**
      * @brief Add a network route to the global routing table.
@@ -135,9 +208,9 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
      *
      * @see Ipv4Address
      */
-    void AddNetworkRouteTo(Ipv4Address network,
-                           Ipv4Mask networkMask,
-                           Ipv4Address nextHop,
+    void AddNetworkRouteTo(IpAddress network,
+                           IpMaskOrPrefix networkMask,
+                           IpAddress nextHop,
                            uint32_t interface);
 
     /**
@@ -150,7 +223,7 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
      *
      * @see Ipv4Address
      */
-    void AddNetworkRouteTo(Ipv4Address network, Ipv4Mask networkMask, uint32_t interface);
+    void AddNetworkRouteTo(IpAddress network, IpMaskOrPrefix networkMask, uint32_t interface);
 
     /**
      * @brief Add an external route to the global routing table.
@@ -161,9 +234,9 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
      * @param interface The network interface index used to send packets to the
      * destination.
      */
-    void AddASExternalRouteTo(Ipv4Address network,
-                              Ipv4Mask networkMask,
-                              Ipv4Address nextHop,
+    void AddASExternalRouteTo(IpAddress network,
+                              IpMaskOrPrefix networkMask,
+                              IpAddress nextHop,
                               uint32_t interface);
 
     /**
@@ -195,7 +268,7 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
      * @see Ipv4RoutingTableEntry
      * @see Ipv4GlobalRouting::RemoveRoute
      */
-    Ipv4RoutingTableEntry* GetRoute(uint32_t i) const;
+    IpRoutingTableEntry* GetRoute(uint32_t i) const;
 
     /**
      * @brief Remove a route from the global unicast routing table.
@@ -239,25 +312,25 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
     Ptr<UniformRandomVariable> m_rand;
 
     /// container of Ipv4RoutingTableEntry (routes to hosts)
-    typedef std::list<Ipv4RoutingTableEntry*> HostRoutes;
+    typedef std::list<IpRoutingTableEntry*> HostRoutes;
     /// const iterator of container of Ipv4RoutingTableEntry (routes to hosts)
-    typedef std::list<Ipv4RoutingTableEntry*>::const_iterator HostRoutesCI;
+    typedef std::list<IpRoutingTableEntry*>::const_iterator HostRoutesCI;
     /// iterator of container of Ipv4RoutingTableEntry (routes to hosts)
-    typedef std::list<Ipv4RoutingTableEntry*>::iterator HostRoutesI;
+    typedef std::list<IpRoutingTableEntry*>::iterator HostRoutesI;
 
     /// container of Ipv4RoutingTableEntry (routes to networks)
-    typedef std::list<Ipv4RoutingTableEntry*> NetworkRoutes;
+    typedef std::list<IpRoutingTableEntry*> NetworkRoutes;
     /// const iterator of container of Ipv4RoutingTableEntry (routes to networks)
-    typedef std::list<Ipv4RoutingTableEntry*>::const_iterator NetworkRoutesCI;
+    typedef std::list<IpRoutingTableEntry*>::const_iterator NetworkRoutesCI;
     /// iterator of container of Ipv4RoutingTableEntry (routes to networks)
-    typedef std::list<Ipv4RoutingTableEntry*>::iterator NetworkRoutesI;
+    typedef std::list<IpRoutingTableEntry*>::iterator NetworkRoutesI;
 
     /// container of Ipv4RoutingTableEntry (routes to external AS)
-    typedef std::list<Ipv4RoutingTableEntry*> ASExternalRoutes;
+    typedef std::list<IpRoutingTableEntry*> ASExternalRoutes;
     /// const iterator of container of Ipv4RoutingTableEntry (routes to external AS)
-    typedef std::list<Ipv4RoutingTableEntry*>::const_iterator ASExternalRoutesCI;
+    typedef std::list<IpRoutingTableEntry*>::const_iterator ASExternalRoutesCI;
     /// iterator of container of Ipv4RoutingTableEntry (routes to external AS)
-    typedef std::list<Ipv4RoutingTableEntry*>::iterator ASExternalRoutesI;
+    typedef std::list<IpRoutingTableEntry*>::iterator ASExternalRoutesI;
 
     /**
      * @brief Lookup in the forwarding table for destination.
@@ -265,13 +338,13 @@ class Ipv4GlobalRouting : public Ipv4RoutingProtocol
      * @param oif output interface if any (put 0 otherwise)
      * @return Ipv4Route to route the packet to reach dest address
      */
-    Ptr<Ipv4Route> LookupGlobal(Ipv4Address dest, Ptr<NetDevice> oif = nullptr);
+    Ptr<IpRoute> LookupGlobal(IpAddress dest, Ptr<NetDevice> oif = nullptr);
 
     HostRoutes m_hostRoutes;             //!< Routes to hosts
     NetworkRoutes m_networkRoutes;       //!< Routes to networks
     ASExternalRoutes m_ASexternalRoutes; //!< External routes imported
 
-    Ptr<Ipv4> m_ipv4; //!< associated IPv4 instance
+    Ptr<Ip> m_ipv4; //!< associated IPv4 instance
 };
 
 } // Namespace ns3
