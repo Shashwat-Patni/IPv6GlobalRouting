@@ -60,12 +60,9 @@ void
 GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
                                Ipv4Address dest,
                                Ptr<OutputStreamWrapper> stream,
+                               bool nodeIdLookup,
                                Time::Unit unit)
 {
-    if (stream == nullptr)
-    {
-        stream = Create<OutputStreamWrapper>(&std::cout);
-    }
     std::ostream* os = stream->GetStream();
     // Copy the current ostream state
     std::ios oldState(nullptr);
@@ -74,21 +71,31 @@ GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
     *os << std::resetiosflags(std::ios::adjustfield) << std::setiosflags(std::ios::left);
     *os << "PrintRoute at Time: " << Now().As(unit);
     *os << " from Node " << sourceNode->GetId() << " to address " << dest;
-    SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode, dest, stream, unit);
+    SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode,
+                                                                   dest,
+                                                                   stream,
+                                                                   nodeIdLookup,
+                                                                   unit);
     (*os).copyfmt(oldState);
+}
+
+void
+GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
+                               Ipv4Address dest,
+                               bool nodeIdLookup,
+                               Time::Unit unit)
+{
+    Ptr<OutputStreamWrapper> stream = Create<OutputStreamWrapper>(&std::cout);
+    GlobalRouteManager::PrintRoute(sourceNode, dest, stream, nodeIdLookup, unit);
 }
 
 void
 GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
                                Ptr<Node> dest,
                                Ptr<OutputStreamWrapper> stream,
+                               bool nodeIdLookup,
                                Time::Unit unit)
 {
-    if (stream == nullptr)
-    {
-        stream = Create<OutputStreamWrapper>(&std::cout);
-    }
-
     std::ostream* os = stream->GetStream();
     // Copy the current ostream state
     std::ios oldState(nullptr);
@@ -97,7 +104,22 @@ GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
     *os << std::resetiosflags(std::ios::adjustfield) << std::setiosflags(std::ios::left);
     *os << "PrintRoute at Time: " << Now().As(unit);
     *os << " from Node " << sourceNode->GetId() << " to Node " << dest->GetId();
-    SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode, dest, stream, unit);
+    SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode,
+                                                                   dest,
+                                                                   stream,
+                                                                   nodeIdLookup,
+                                                                   unit);
     (*os).copyfmt(oldState);
 }
+
+void
+GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
+                               Ptr<Node> dest,
+                               bool nodeIdLookup,
+                               Time::Unit unit)
+{
+    Ptr<OutputStreamWrapper> stream = Create<OutputStreamWrapper>(&std::cout);
+    GlobalRouteManager::PrintRoute(sourceNode, dest, stream, nodeIdLookup, unit);
+}
+
 } // namespace ns3

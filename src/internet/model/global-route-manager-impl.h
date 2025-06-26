@@ -745,6 +745,7 @@ class GlobalRouteManagerImpl
     void PrintRoute(Ptr<Node> sourceNode,
                     Ptr<Node> dest,
                     Ptr<OutputStreamWrapper> stream,
+                    bool nodeIdLookup,
                     Time::Unit unit);
 
     /**
@@ -758,6 +759,7 @@ class GlobalRouteManagerImpl
     void PrintRoute(Ptr<Node> sourceNode,
                     Ipv4Address dest,
                     Ptr<OutputStreamWrapper> stream,
+                    bool nodeIdLookup,
                     Time::Unit unit);
 
   private:

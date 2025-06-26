@@ -17,7 +17,10 @@
 
 /*
 *    This example demonstrates how to use Ipv4GlobalRoutingHelper::PrintRoute() and its variants to
-print the route path as calculated by the global routing protocol.
+*    print the route path as calculated by the global routing protocol. The Print Format loosely
+follows that of traceRoute.
+*    Similar to TraceRoute, There is an option to disable the Reverse Node ID lookup.
+*
 *
 *    ///@to-do: Finish this after all overloads are done///
 *

@@ -2185,12 +2185,14 @@ void
 GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
                                    Ptr<Node> dest,
                                    Ptr<OutputStreamWrapper> stream,
+                                   bool nodeIdLookup,
                                    Time::Unit unit)
 {
     // Get any Ip of destination other than the loopbackIp
     Ptr<Ipv4> ipv4 = dest->GetObject<Ipv4>();
+
     uint32_t numInterfaces = ipv4->GetNInterfaces();
-    Ipv4Address destinationAddr = nullptr;
+    Ipv4Address destinationAddr;
     for (uint32_t i = 0; i < numInterfaces; i++)
     {
         uint32_t numAddresses = ipv4->GetNAddresses(i);
@@ -2204,13 +2206,15 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
             }
         }
     }
-    PrintRoute(sourceNode, destinationAddr, stream, unit);
+
+    PrintRoute(sourceNode, destinationAddr, stream, nodeIdLookup, unit);
 }
 
 void
 GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
                                    Ipv4Address dest,
                                    Ptr<OutputStreamWrapper> stream,
+                                   bool nodeIdLookup,
                                    Time::Unit unit)
 {
     NS_LOG_FUNCTION(this << sourceNode << dest);
@@ -2324,13 +2328,8 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
             {
                 NS_LOG_DEBUG("PrintRouteAt: Source and Destination are on the same Node "
                              << sourceNode->GetId());
-                std::ostringstream addr;
-                std::ostringstream node;
-                node << "(Node " << destNode->GetId() << ")";
-                addr << dest;
-                *os << std::right << std::setw(2) << currHop++ << "  " << addr.str() << " "
-                    << node.str() << std::endl
-                    << std::endl;
+                *os << "Source and Destination are on the same Node";
+                *os << std::endl << std::endl;
 
                 return;
             }
@@ -2476,10 +2475,15 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         // print this iteration
         std::ostringstream addr;
         std::ostringstream node;
+
         node << "(Node " << nextNode->GetId() << ")";
         addr << gatewayAddress;
-        *os << std::right << std::setw(2) << currHop++ << "  " << addr.str() << " " << node.str()
-            << std::endl;
+        *os << std::right << std::setw(2) << currHop++ << "  " << addr.str();
+        if (nodeIdLookup)
+        {
+            *os << " " << node.str();
+        }
+        *os << std::endl;
         currentNode = nextNode;
         currentNodeIp = gatewayAddress;
         maxHop--;
@@ -2494,8 +2498,13 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         std::ostringstream node;
         node << "(Node " << destNode->GetId() << ")";
         addr << dest;
-        *os << std::right << std::setw(2) << " " << "  " << addr.str() << " " << node.str()
-            << std::endl;
+        *os << std::right << std::setw(2) << ""
+            << "  " << addr.str();
+        if (nodeIdLookup)
+        {
+            *os << " " << node.str();
+        }
+        *os << std::endl;
     }
     *os << std::endl;
     // Restore the previous ostream state
