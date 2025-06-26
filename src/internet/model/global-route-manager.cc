@@ -60,7 +60,23 @@ GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
                                Ptr<OutputStreamWrapper> stream,
                                Time::Unit unit)
 {
+    if (stream == nullptr)
+    {
+        stream = Create<OutputStreamWrapper>(&std::cout);
+    }
     SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode, dest, stream, unit);
 }
 
+void
+GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
+                               Ptr<Node> dest,
+                               Ptr<OutputStreamWrapper> stream,
+                               Time::Unit unit)
+{
+    if (stream == nullptr)
+    {
+        stream = Create<OutputStreamWrapper>(&std::cout);
+    }
+    SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode, dest, stream, unit);
+}
 } // namespace ns3

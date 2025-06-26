@@ -743,6 +743,19 @@ class GlobalRouteManagerImpl
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */
     void PrintRoute(Ptr<Node> sourceNode,
+                    Ptr<Node> dest,
+                    Ptr<OutputStreamWrapper> stream,
+                    Time::Unit unit);
+
+    /**
+     *@brief prints the path from this node to the destination node at a particular time.
+     * @param sourceNode the source node
+     * @param dest the destination nodes ipv4 address
+     * @param stream The output stream to which the routing path will be written.
+     * @param unit The time unit for timestamps in the printed output.
+     * @see Ipv4GlobalRoutingHelper::PrintRoute
+     */
+    void PrintRoute(Ptr<Node> sourceNode,
                     Ipv4Address dest,
                     Ptr<OutputStreamWrapper> stream,
                     Time::Unit unit);

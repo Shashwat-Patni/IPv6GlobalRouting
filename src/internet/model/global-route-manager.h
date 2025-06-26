@@ -72,8 +72,20 @@ class GlobalRouteManager
      */
     static void PrintRoute(Ptr<Node> sourceNode,
                            Ipv4Address dest,
-                           Ptr<OutputStreamWrapper> stream,
-                           Time::Unit unit);
+                           Ptr<OutputStreamWrapper> stream = nullptr,
+                           Time::Unit unit = Time::S);
+    /**
+     *@brief prints the path from this node to the destination node at a particular time.
+     * @param sourceNode The IPv4 address of the source node.
+     * @param dest The IPv4 address of the destination node.
+     * @param stream The output stream to which the routing path will be written.
+     * @param unit The time unit for timestamps in the printed output.
+     * @see Ipv4GlobalRoutingHelper::PrintRoute
+     */
+    static void PrintRoute(Ptr<Node> sourceNode,
+                           Ptr<Node> dest,
+                           Ptr<OutputStreamWrapper> stream = nullptr,
+                           Time::Unit unit = Time::S);
 };
 
 } // namespace ns3

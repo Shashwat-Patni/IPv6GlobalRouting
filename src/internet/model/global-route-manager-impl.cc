@@ -2183,6 +2183,32 @@ GlobalRouteManagerImpl::GetNodeByIP(Ipv4Address address)
 
 void
 GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
+                                   Ptr<Node> dest,
+                                   Ptr<OutputStreamWrapper> stream,
+                                   Time::Unit unit)
+{
+    // Get any Ip of destination other than the loopbackIp
+    Ptr<Ipv4> ipv4 = dest->GetObject<Ipv4>();
+    uint32_t numInterfaces = ipv4->GetNInterfaces();
+    Ipv4Address destinationAddr = nullptr;
+    for (uint32_t i = 0; i < numInterfaces; i++)
+    {
+        uint32_t numAddresses = ipv4->GetNAddresses(i);
+        for (uint32_t j = 0; j < numAddresses; j++)
+        {
+            Ipv4InterfaceAddress addr = ipv4->GetAddress(i, j);
+            if (addr.GetLocal() != Ipv4Address::GetLoopback())
+            {
+                destinationAddr = addr.GetLocal();
+                break;
+            }
+        }
+    }
+    PrintRoute(sourceNode, destinationAddr, stream, unit);
+}
+
+void
+GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
                                    Ipv4Address dest,
                                    Ptr<OutputStreamWrapper> stream,
                                    Time::Unit unit)
@@ -2463,16 +2489,6 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         currentNode = nextNode;
         currentNodeIp = gatewayAddress;
         maxHop--;
-    }
-    if (currentNode == destNode)
-    {
-        std::ostringstream addr;
-        std::ostringstream node;
-        node << "(Node " << destNode->GetId() << ")";
-        addr << dest;
-        *os << std::right << std::setw(2) << currHop++ << "  " << addr.str() << " " << node.str()
-            << std::endl
-            << std::endl;
     }
     *os << std::endl;
     // Restore the previous ostream state

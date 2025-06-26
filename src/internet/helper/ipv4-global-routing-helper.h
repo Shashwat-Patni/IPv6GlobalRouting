@@ -84,7 +84,28 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
     static void PrintRouteAt(Time printTime,
                              Ptr<Node> sourceNode,
                              Ipv4Address dest,
-                             Ptr<OutputStreamWrapper> stream,
+                             Ptr<OutputStreamWrapper> stream = nullptr,
+                             Time::Unit unit = Time::S);
+
+    /**
+     * @brief prints the routing path for a source and destination at a particular time.
+     * If the routing path does not exist, it prints that the path does not exist between
+     * the nodes in the ostream.this is a scheduler for the PrintRoute call.
+     *
+     * @param printTime the time at which the routing path is supposed to be printed.
+     * @param sourceNode the source node pointer to start traversing
+     * @param dest the IPv4 destination address
+     * @param stream the output stream object to use
+     * @param unit the time unit to be used in the report
+     *
+     * This method calls the PrintRoutingPath() method of the
+     * Ipv4GlobalRouting for the source and destination to provide
+     * the routing path at the specified time.
+     */
+    static void PrintRouteAt(Time printTime,
+                             Ptr<Node> sourceNode,
+                             Ptr<Node> dest,
+                             Ptr<OutputStreamWrapper> stream = nullptr,
                              Time::Unit unit = Time::S);
 
     /**
@@ -101,7 +122,24 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
      */
     static void PrintRoute(Ptr<Node> sourceNode,
                            Ipv4Address dest,
-                           Ptr<OutputStreamWrapper> stream,
+                           Ptr<OutputStreamWrapper> stream = nullptr,
+                           Time::Unit unit = Time::S);
+
+    /**
+     * @brief prints the routing path for the source and destination. If the routing path
+     * does not exist, it prints that the path does not exist between the nodes in the ostream.
+     * @param sourceNode the source node pointer to start traversing
+     * @param dest the IPv4 destination address
+     * @param stream the output stream object to use
+     * @param unit the time unit to be used in the report
+     *
+     * This method calls the PrintRoutingPath() method of the
+     * Ipv4GlobalRouting for the source and destination to provide
+     * the routing path.
+     */
+    static void PrintRoute(Ptr<Node> sourceNode,
+                           Ptr<Node> dest,
+                           Ptr<OutputStreamWrapper> stream = nullptr,
                            Time::Unit unit = Time::S);
 
     /**

@@ -54,27 +54,55 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables()
 }
 
 void
-Ipv4GlobalRoutingHelper::PrintRouteAt(Time printTime,
-                                      Ptr<Node> sourceNode,
-                                      Ipv4Address dest,
-                                      Ptr<OutputStreamWrapper> stream,
-                                      Time::Unit unit)
-{
-    Simulator::Schedule(printTime,
-                        &Ipv4GlobalRoutingHelper::PrintRoute,
-                        sourceNode,
-                        dest,
-                        stream,
-                        unit);
-}
-
-void
 Ipv4GlobalRoutingHelper::PrintRoute(Ptr<Node> sourceNode,
                                     Ipv4Address dest,
                                     Ptr<OutputStreamWrapper> stream,
                                     Time::Unit unit)
 {
     GlobalRouteManager::PrintRoute(sourceNode, dest, stream, unit);
+}
+
+void
+Ipv4GlobalRoutingHelper::PrintRoute(Ptr<Node> sourceNode,
+                                    Ptr<Node> dest,
+                                    Ptr<OutputStreamWrapper> stream,
+                                    Time::Unit unit)
+{
+    GlobalRouteManager::PrintRoute(sourceNode, dest, stream, unit);
+}
+
+void
+Ipv4GlobalRoutingHelper::PrintRouteAt(Time printTime,
+                                      Ptr<Node> sourceNode,
+                                      Ipv4Address dest,
+                                      Ptr<OutputStreamWrapper> stream,
+                                      Time::Unit unit)
+{
+    Simulator::Schedule(
+        printTime,
+        static_cast<void (*)(Ptr<Node>, Ipv4Address, Ptr<OutputStreamWrapper>, Time::Unit)>(
+            &Ipv4GlobalRoutingHelper::PrintRoute),
+        sourceNode,
+        dest,
+        stream,
+        unit);
+}
+
+void
+Ipv4GlobalRoutingHelper::PrintRouteAt(Time printTime,
+                                      Ptr<Node> sourceNode,
+                                      Ptr<Node> dest,
+                                      Ptr<OutputStreamWrapper> stream,
+                                      Time::Unit unit)
+{
+    Simulator::Schedule(
+        printTime,
+        static_cast<void (*)(Ptr<Node>, Ptr<Node>, Ptr<OutputStreamWrapper>, Time::Unit)>(
+            &Ipv4GlobalRoutingHelper::PrintRoute),
+        sourceNode,
+        dest,
+        stream,
+        unit);
 }
 
 void
