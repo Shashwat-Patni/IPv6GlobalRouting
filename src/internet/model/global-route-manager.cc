@@ -14,6 +14,8 @@
 #include "ns3/log.h"
 #include "ns3/simulation-singleton.h"
 
+#include <iomanip>
+
 namespace ns3
 {
 
@@ -64,7 +66,16 @@ GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
     {
         stream = Create<OutputStreamWrapper>(&std::cout);
     }
+    std::ostream* os = stream->GetStream();
+    // Copy the current ostream state
+    std::ios oldState(nullptr);
+    oldState.copyfmt(*os);
+
+    *os << std::resetiosflags(std::ios::adjustfield) << std::setiosflags(std::ios::left);
+    *os << "PrintRoute at Time: " << Now().As(unit);
+    *os << " from Node " << sourceNode->GetId() << " to address " << dest;
     SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode, dest, stream, unit);
+    (*os).copyfmt(oldState);
 }
 
 void
@@ -77,6 +88,16 @@ GlobalRouteManager::PrintRoute(Ptr<Node> sourceNode,
     {
         stream = Create<OutputStreamWrapper>(&std::cout);
     }
+
+    std::ostream* os = stream->GetStream();
+    // Copy the current ostream state
+    std::ios oldState(nullptr);
+    oldState.copyfmt(*os);
+
+    *os << std::resetiosflags(std::ios::adjustfield) << std::setiosflags(std::ios::left);
+    *os << "PrintRoute at Time: " << Now().As(unit);
+    *os << " from Node " << sourceNode->GetId() << " to Node " << dest->GetId();
     SimulationSingleton<GlobalRouteManagerImpl>::Get()->PrintRoute(sourceNode, dest, stream, unit);
+    (*os).copyfmt(oldState);
 }
 } // namespace ns3

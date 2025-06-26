@@ -2302,17 +2302,12 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         return;
     }
 
+    // Set up the output stream
+    std::ostream* os = stream->GetStream();
+
     uint32_t maxHop = 64;
     uint32_t currHop = 1;
-
-    std::ostream* os = stream->GetStream();
-    // Copy the current ostream state
-    std::ios oldState(nullptr);
-    oldState.copyfmt(*os);
-
-    *os << std::resetiosflags(std::ios::adjustfield) << std::setiosflags(std::ios::left);
-    *os << "PrintRoute at Time: " << Now().As(unit);
-    *os << " from Node " << sourceNode->GetId() << " to Node " << destNode->GetId();
+    // Print the maxHop. This is similar to TraceRoute
     *os << ", " << maxHop << " hops Max." << std::endl;
 
     // first check if its local delivery
@@ -2336,7 +2331,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
                 *os << std::right << std::setw(2) << currHop++ << "  " << addr.str() << " "
                     << node.str() << std::endl
                     << std::endl;
-                (*os).copyfmt(oldState);
+
                 return;
             }
         }
@@ -2354,7 +2349,6 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         *os << "There does not exist a path from Node " << sourceNode->GetId() << " to Node "
             << destNode->GetId() << "." << std::endl
             << std::endl;
-        (*os).copyfmt(oldState);
         return;
     }
 
@@ -2490,9 +2484,21 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         currentNodeIp = gatewayAddress;
         maxHop--;
     }
+    // if the ingresss ip is different than the destination ip also print the destination Ip
+    if (currentNodeIp != dest)
+    {
+        // this is not counted as a hop
+        currHop--;
+
+        std::ostringstream addr;
+        std::ostringstream node;
+        node << "(Node " << destNode->GetId() << ")";
+        addr << dest;
+        *os << std::right << std::setw(2) << " " << "  " << addr.str() << " " << node.str()
+            << std::endl;
+    }
     *os << std::endl;
     // Restore the previous ostream state
-    (*os).copyfmt(oldState);
 }
 
 } // namespace ns3

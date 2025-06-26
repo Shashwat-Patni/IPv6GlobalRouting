@@ -112,7 +112,7 @@ main(int argc, char* argv[])
 
     Ipv4GlobalRoutingHelper::PrintRouteAt(Seconds(6),
                                           n.Get(0),
-                                          interfaces23.GetAddress(1),
+                                          interfaces23.GetAddress(0),
                                           routingStream);
 
     // uncomment to see all routing tables
