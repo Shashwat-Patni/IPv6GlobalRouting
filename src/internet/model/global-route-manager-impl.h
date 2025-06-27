@@ -728,17 +728,18 @@ class GlobalRouteManagerImpl
     void DebugSPFCalculate(Ipv4Address root);
 
     /**
-     * @brief given iP it iterates through the node list to find the node associated with the ip
-     * @param source ip address whose node we want to find
+     * @brief given IP it iterates through the node list to find the node associated with the ip
+     * @param source ip address associated with the node we want to find
      * @returns the node pointer to the ip
      */
-    Ptr<Node> GetNodeByIP(Ipv4Address source);
+    Ptr<Node> GetNodeByIp(Ipv4Address source);
 
     /**
      *@brief prints the path from this node to the destination node at a particular time.
      * @param sourceNode the source node
-     * @param dest the destination nodes ipv4 address
+     * @param dest the destination node
      * @param stream The output stream to which the routing path will be written.
+     * @param nodeIdLookup Print the Node Id
      * @param unit The time unit for timestamps in the printed output.
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */
@@ -753,6 +754,7 @@ class GlobalRouteManagerImpl
      * @param sourceNode the source node
      * @param dest the destination nodes ipv4 address
      * @param stream The output stream to which the routing path will be written.
+     * @param nodeIdLookup Print the node id
      * @param unit The time unit for timestamps in the printed output.
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */

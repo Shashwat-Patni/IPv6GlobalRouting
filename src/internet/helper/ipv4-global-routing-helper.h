@@ -69,12 +69,13 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
     /**
      * @brief prints the routing path for a source and destination at a particular time.
      * If the routing path does not exist, it prints that the path does not exist between
-     * the nodes in the ostream.this is a scheduler for the PrintRoute call.
+     * the nodes in the ostream. This is a scheduler for the PrintRoute call.
      *
-     * @param printTime the time at which the routing path is supposed to be printed.
-     * @param sourceNode the source node pointer to start traversing
+     * @param printTime the time at which the routing path should be printed.
+     * @param sourceNode the source node
      * @param dest the IPv4 destination address
      * @param stream the output stream object to use
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the
@@ -93,10 +94,10 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
      * If the routing path does not exist, it prints that the path does not exist between
      * the nodes in the ostream.this is a scheduler for the PrintRoute call.
      *
-     * @param printTime the time at which the routing path is supposed to be printed.
-     * @param sourceNode the source node pointer to start traversing
+     * @param printTime the time at which the routing path should be printed.
+     * @param sourceNode the source node
      * @param dest the IPv4 destination address
-     * @param stream the output stream object to use
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the
@@ -114,10 +115,11 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
      * If the routing path does not exist, it prints that the path does not exist between
      * the nodes in the ostream.this is a scheduler for the PrintRoute call.
      *
-     * @param printTime the time at which the routing path is supposed to be printed.
-     * @param sourceNode the source node pointer to start traversing
-     * @param dest the IPv4 destination address
+     * @param printTime the time at which the routing path should be printed.
+     * @param sourceNode the source node
+     * @param dest the destination node
      * @param stream the output stream object to use
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the
@@ -136,10 +138,10 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
      * If the routing path does not exist, it prints that the path does not exist between
      * the nodes in the ostream.this is a scheduler for the PrintRoute call.
      *
-     * @param printTime the time at which the routing path is supposed to be printed.
-     * @param sourceNode the source node pointer to start traversing
-     * @param dest the IPv4 destination address
-     * @param stream the output stream object to use
+     * @param printTime the time at which the routing path should be printed.
+     * @param sourceNode the source node
+     * @param dest the destination node
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the
@@ -155,9 +157,10 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
     /**
      * @brief prints the routing path for the source and destination. If the routing path
      * does not exist, it prints that the path does not exist between the nodes in the ostream.
-     * @param sourceNode the source node pointer to start traversing
+     * @param sourceNode the source node
      * @param dest the IPv4 destination address
      * @param stream the output stream object to use
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the
@@ -173,9 +176,9 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
     /**
      * @brief prints the routing path for the source and destination. If the routing path
      * does not exist, it prints that the path does not exist between the nodes in the ostream.
-     * @param sourceNode the source node pointer to start traversing
+     * @param sourceNode the source node
      * @param dest the IPv4 destination address
-     * @param stream the output stream object to use
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the
@@ -190,9 +193,10 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
     /**
      * @brief prints the routing path for the source and destination. If the routing path
      * does not exist, it prints that the path does not exist between the nodes in the ostream.
-     * @param sourceNode the source node pointer to start traversing
-     * @param dest the IPv4 destination address
+     * @param sourceNode The source node
+     * @param dest The destination node
      * @param stream the output stream object to use
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the
@@ -208,9 +212,9 @@ class Ipv4GlobalRoutingHelper : public Ipv4RoutingHelper
     /**
      * @brief prints the routing path for the source and destination. If the routing path
      * does not exist, it prints that the path does not exist between the nodes in the ostream.
-     * @param sourceNode the source node pointer to start traversing
-     * @param dest the IPv4 destination address
-     * @param stream the output stream object to use
+     * @param sourceNode The source node
+     * @param dest The destination node
+     * @param nodeIdLookup print the node id
      * @param unit the time unit to be used in the report
      *
      * This method calls the PrintRoutingPath() method of the

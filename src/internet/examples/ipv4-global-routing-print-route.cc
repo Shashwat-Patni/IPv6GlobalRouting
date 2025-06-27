@@ -16,30 +16,30 @@
 #include "ns3/test.h"
 
 /**
-*    This example demonstrates how to use Ipv4GlobalRoutingHelper::PrintRoute() , PrintRoutePathAt()
-and its overloads to
-  print the route path as calculated by the global routing protocol. The Print Format loosely
-follows that of traceRoute.
-   Similar to TraceRoute, There is an option to disable the Reverse Node ID lookup.
-*We have two Functions PrintRoute() and PrintRouteAt(). Each of these have 4 overloads.
+* This example demonstrates how to use Ipv4GlobalRoutingHelper::PrintRoute()
+  and PrintRoutePathAt() and its overloads to print the route path as calculated
+  by the global routing protocol. The Print Format loosely follows that of traceroute.
+  Similar to traceroute, there is an option to disable the Reverse Node ID lookup.
 
 
-* PrintRoute(): Prints the route from:
-                * Source node  to destination node pointer given a output stream
-                *  Source Node to a destination Ip given a output stream
-                The other two overloads are for defaulting to the std::Cout output stream
+  We have two functions PrintRoute() and PrintRouteAt(). Each of these has 4 overloads.
+
+  PrintRoute(): Prints the route from:
+                * Source node  to destination node given a output stream
+                * Source node to a destination Ip given a output stream
+                The other two overloads are for defaulting to the std::cout output stream
 
   PrintRouteAt(): Similar to PrintRoute but takes in a printTime argument to determine when in the
                   simulation the output is printed. Similar overloads:
                   * Source node  to destination node pointer given a output stream
-                  * Source Node to a destination Ip given a output stream
-                  The other two overloads are for defaulting to the std::Cout output stream
+                  * Source node to a destination Ip given a output stream
+                  The other two overloads are for defaulting to the std::cout output stream
 
   The default behaviour is to also print the reverse node id. This can be disabled by setting the
-  NodeIdLookup argument to false.this is similar to linux traceroute -n option.
+  nodeIdLookup argument to false. This is similar to linux traceroute -n option.
 
   We explain the use of each of the overloads for PrintRoute() using the below topology
-  The At variant behaves similarly with the added time argument.
+  The PrintRouteAt() variant behaves similarly with the added time argument.
 
 
 
@@ -147,7 +147,7 @@ main(int argc, char* argv[])
     // PrintRoute(): Route from:  Source node  to destination IP Address given an output stream
     Ipv4GlobalRoutingHelper::PrintRoute(n.Get(1), interfaces12.GetAddress(1), routingStream);
 
-    // PrintRoute(): Route From : Source node to Destination Node given an output stream
+    // PrintRoute(): Route from : Source node to destination node given an output stream
     Ipv4GlobalRoutingHelper::PrintRoute(n.Get(1), n.Get(3), routingStream);
 
     // Variant with output stream as std::cout by default

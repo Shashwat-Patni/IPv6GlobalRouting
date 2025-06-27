@@ -2161,7 +2161,7 @@ GlobalRouteManagerImpl::SPFVertexAddParent(SPFVertex* v)
 }
 
 Ptr<Node>
-GlobalRouteManagerImpl::GetNodeByIP(Ipv4Address address)
+GlobalRouteManagerImpl::GetNodeByIp(Ipv4Address address)
 {
     // iterate through the list of nodes
     for (auto i = NodeList::Begin(); i != NodeList::End(); ++i)
@@ -2169,7 +2169,7 @@ GlobalRouteManagerImpl::GetNodeByIP(Ipv4Address address)
         Ptr<Node> node = *i;
         Ptr<Ipv4> ipv4 = node->GetObject<Ipv4>();
 
-        if (ipv4 != nullptr)
+        if (ipv4)
         {
             int32_t interface = ipv4->GetInterfaceForAddress(address);
             if (interface >= 0) // Address found on this node
@@ -2219,7 +2219,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
 {
     NS_LOG_FUNCTION(this << sourceNode << dest);
 
-    Ptr<Node> destNode = GetNodeByIP(dest);
+    Ptr<Node> destNode = GetNodeByIp(dest);
 
     // check that dest is a valid ip
     if (dest == Ipv4Address::GetLoopback())
@@ -2228,13 +2228,13 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         return;
     }
 
-    if (sourceNode == nullptr)
+    if (!sourceNode)
     {
         NS_LOG_ERROR("No Source Node Provided");
         return;
     }
     // check that given ipv4address exists
-    if (destNode == nullptr)
+    if (!destNode)
     {
         NS_LOG_ERROR("Destination node not found for IP address: " << dest);
         return;
@@ -2242,7 +2242,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
 
     Ptr<Ipv4> ipv4 = sourceNode->GetObject<Ipv4>();
     // check for ipv4 stack
-    if (ipv4 == nullptr)
+    if (!ipv4)
     {
         NS_LOG_ERROR("No Ipv4 object found on source node " << sourceNode->GetId());
         return;
@@ -2275,12 +2275,12 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
     Ptr<Ipv4GlobalRouting> globalRouting =
         DynamicCast<Ipv4GlobalRouting>(ipv4->GetRoutingProtocol());
 
-    if (globalRouting == nullptr)
+    if (!globalRouting)
     {
         Ptr<Ipv4ListRouting> listRouting = DynamicCast<Ipv4ListRouting>(ipv4->GetRoutingProtocol());
 
         // Ensure it's a valid Ipv4ListRouting
-        if (listRouting != nullptr)
+        if (listRouting)
         {
             for (uint32_t i = 0; i < listRouting->GetNRoutingProtocols(); i++)
             {
@@ -2289,7 +2289,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
                 Ptr<Ipv4GlobalRouting> tempglobalRouting =
                     DynamicCast<Ipv4GlobalRouting>(listRouting->GetRoutingProtocol(i, priority));
 
-                if (tempglobalRouting != nullptr)
+                if (tempglobalRouting)
                 {
                     // Found a global routing protocol inside the list
                     globalRouting = tempglobalRouting;
@@ -2300,7 +2300,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
     }
 
     // Final check: If still nullptr, GlobalRouting wasn't found anywhere
-    if (globalRouting == nullptr)
+    if (!globalRouting)
     {
         NS_LOG_ERROR("No global routing protocol found on source node " << sourceNode->GetId());
         return;
@@ -2309,10 +2309,10 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
     // Set up the output stream
     std::ostream* os = stream->GetStream();
 
-    uint32_t maxHop = 64;
+    uint32_t hopsRemaining = 64;
     uint32_t currHop = 1;
     // Print the maxHop. This is similar to TraceRoute
-    *os << ", " << maxHop << " hops Max." << std::endl;
+    *os << ", " << hopsRemaining << " hops Max." << std::endl;
 
     // first check if its local delivery
     uint32_t numInterfaces = ipv4->GetNInterfaces();
@@ -2343,7 +2343,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
     visitedNodes.push_back(currentNode);
 
     // check if routes exist
-    if (globalRouting->LookupGlobal(dest) == nullptr)
+    if (!globalRouting->LookupGlobal(dest))
     {
         *os << "There does not exist a path from Node " << sourceNode->GetId() << " to Node "
             << destNode->GetId() << "." << std::endl
@@ -2353,19 +2353,19 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
 
     while (currentNode != destNode)
     {
-        NS_ASSERT_MSG(maxHop, "Max Hop Limit reached");
+        NS_ASSERT_MSG(hopsRemaining, "Max Hop Limit reached");
 
         Ptr<Ipv4> ipv4CurrentNode = currentNode->GetObject<Ipv4>();
         uint32_t currentNodeId = currentNode->GetId();
         Ptr<Ipv4GlobalRouting> router =
             DynamicCast<Ipv4GlobalRouting>(ipv4CurrentNode->GetRoutingProtocol());
-        if (router == nullptr)
+        if (!router)
         {
             Ptr<Ipv4ListRouting> listRouter =
                 DynamicCast<Ipv4ListRouting>(ipv4CurrentNode->GetRoutingProtocol());
 
             // Ensure it's a valid Ipv4ListRouting
-            if (listRouter != nullptr)
+            if (listRouter)
             {
                 for (uint32_t i = 0; i < listRouter->GetNRoutingProtocols(); i++)
                 {
@@ -2373,7 +2373,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
                     int16_t priority = 0;
                     Ptr<Ipv4GlobalRouting> tempRouter =
                         DynamicCast<Ipv4GlobalRouting>(listRouter->GetRoutingProtocol(i, priority));
-                    if (tempRouter != nullptr)
+                    if (tempRouter)
                     {
                         // Found a global routing protocol inside the list
                         router = tempRouter;
@@ -2383,14 +2383,14 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
             }
         }
         // Final check: If still nullptr, GlobalRouting wasn't found anywhere
-        if (router == nullptr)
+        if (!router)
         {
             NS_LOG_ERROR("No global router found on Node " << currentNodeId);
             return;
         }
         Ptr<Ipv4Route> gateway = router->LookupGlobal(dest);
         // check if the gateway exists
-        if (gateway == nullptr)
+        if (!gateway)
         {
             NS_LOG_ERROR("No next hop found");
             return;
@@ -2443,8 +2443,8 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
             }
         }
 
-        Ptr<Node> nextNode = GetNodeByIP(gatewayAddress);
-        if (nextNode == nullptr)
+        Ptr<Node> nextNode = GetNodeByIp(gatewayAddress);
+        if (!nextNode)
         {
             *os << "No Node found with GatewayAddress " << gatewayAddress << std::endl << std::endl;
             NS_LOG_ERROR("Did not find the next node for the gateway address " << gatewayAddress);
@@ -2486,7 +2486,7 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
         *os << std::endl;
         currentNode = nextNode;
         currentNodeIp = gatewayAddress;
-        maxHop--;
+        hopsRemaining--;
     }
     // if the ingresss ip is different than the destination ip also print the destination Ip
     if (currentNodeIp != dest)

@@ -64,9 +64,10 @@ class GlobalRouteManager
 
     /**
      *@brief prints the path from this node to the destination node at a particular time.
-     * @param sourceNode The IPv4 address of the source node.
+     * @param sourceNode The source node.
      * @param dest The IPv4 address of the destination node.
      * @param stream The output stream to which the routing path will be written.
+     * @param nodeIdLookup Print the Node Id
      * @param unit The time unit for timestamps in the printed output.
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */
@@ -78,9 +79,9 @@ class GlobalRouteManager
 
     /**
      *@brief prints the path from this node to the destination node at a particular time.
-     * @param sourceNode The IPv4 address of the source node.
+     * @param sourceNode The source node.
      * @param dest The IPv4 address of the destination node.
-     * @param stream The output stream to which the routing path will be written.
+     * @param nodeIdLookup Print the Node Id
      * @param unit The time unit for timestamps in the printed output.
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */
@@ -90,9 +91,10 @@ class GlobalRouteManager
                            Time::Unit unit = Time::S);
     /**
      *@brief prints the path from this node to the destination node at a particular time.
-     * @param sourceNode The IPv4 address of the source node.
-     * @param dest The IPv4 address of the destination node.
+     * @param sourceNode  The source node.
+     * @param dest The destination node.
      * @param stream The output stream to which the routing path will be written.
+     * @param nodeIdLookup Print the Node Id
      * @param unit The time unit for timestamps in the printed output.
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */
@@ -103,9 +105,9 @@ class GlobalRouteManager
                            Time::Unit unit = Time::S);
     /**
      *@brief prints the path from this node to the destination node at a particular time.
-     * @param sourceNode The IPv4 address of the source node.
-     * @param dest The IPv4 address of the destination node.
-     * @param stream The output stream to which the routing path will be written.
+     * @param sourceNode The source node.
+     * @param dest The destination node.
+     * @param nodeIdLookup Print the Node Id
      * @param unit The time unit for timestamps in the printed output.
      * @see Ipv4GlobalRoutingHelper::PrintRoute
      */
