@@ -986,7 +986,7 @@ Ipv4DynamicGlobalRoutingTestCase::DoRun()
 {
     // The below value configures the default behavior of global routing.
     // By default, it is disabled.  To respond to interface events, set to true
-    Config::SetDefault("ns3::GlobalRouting::RespondToInterfaceEvents", BooleanValue(true));
+    Config::SetDefault("ns3::Ipv4GlobalRouting::RespondToInterfaceEvents", BooleanValue(true));
 
     NodeContainer c;
     c.Create(7);

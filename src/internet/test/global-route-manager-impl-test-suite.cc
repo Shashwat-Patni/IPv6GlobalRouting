@@ -651,7 +651,7 @@ RandomEcmpTestCase::RandomEcmpTestCase()
 void
 RandomEcmpTestCase::DoSetup()
 {
-    Config::SetDefault("ns3::GlobalRouting::RandomEcmpRouting", BooleanValue(true));
+    Config::SetDefault("ns3::Ipv4GlobalRouting::RandomEcmpRouting", BooleanValue(true));
     /*
     //   Creating a Simple topology with 4 nodes and 3 links
     //
