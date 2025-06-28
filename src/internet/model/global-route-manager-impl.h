@@ -34,7 +34,7 @@ const uint32_t SPF_INFINITY = 0xffffffff; //!< "infinite" distance between nodes
 
 class CandidateQueue;
 template <typename>
-class Ipv4GlobalRouting;
+class GlobalRouting;
 
 /**
  * @ingroup globalrouting

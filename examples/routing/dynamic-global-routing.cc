@@ -71,7 +71,7 @@ main(int argc, char* argv[])
 {
     // The below value configures the default behavior of global routing.
     // By default, it is disabled.  To respond to interface events, set to true
-    Config::SetDefault("ns3::GlobalRouting::RespondToInterfaceEvents", BooleanValue(true));
+    Config::SetDefault("ns3::Ipv4GlobalRouting::RespondToInterfaceEvents", BooleanValue(true));
 
     // Allow the user to override any of the defaults and the above
     // Bind ()s at run-time, via command-line arguments
