@@ -995,6 +995,12 @@ class GlobalRouter : public Object
     void DoDispose() override;
 };
 
+/**
+ * @ingroup globalrouting
+ * Create the typedef Ipv4GlobalRouting with T as Ipv4RoutingProtocol
+ */
+typedef GlobalRouter<Ipv4Manager> Ipv4GlobalRouter;
+
 } // namespace ns3
 
 #endif /* GLOBAL_ROUTER_INTERFACE_H */
