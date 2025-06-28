@@ -39,13 +39,13 @@ GlobalRouting<T>::GetTypeId()
                           "Set to true if packets are randomly routed among ECMP; set to false for "
                           "using only one route consistently",
                           BooleanValue(false),
-                          MakeBooleanAccessor(&GlobalRouting::m_randomEcmpRouting),
+                          MakeBooleanAccessor(&Ipv4GlobalRouting::m_randomEcmpRouting),
                           MakeBooleanChecker())
             .AddAttribute("RespondToInterfaceEvents",
                           "Set to true if you want to dynamically recompute the global routes upon "
                           "Interface notification events (up/down, or add/remove address)",
                           BooleanValue(false),
-                          MakeBooleanAccessor(&GlobalRouting::m_respondToInterfaceEvents),
+                          MakeBooleanAccessor(&Ipv4GlobalRouting::m_respondToInterfaceEvents),
                           MakeBooleanChecker());
     return tid;
 }

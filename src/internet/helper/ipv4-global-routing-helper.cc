@@ -40,8 +40,8 @@ Ipv4GlobalRoutingHelper::Create(Ptr<Node> node) const
     node->AggregateObject(globalRouter);
 
     NS_LOG_LOGIC("Adding GlobalRouting Protocol to node " << node->GetId());
-    Ptr<GlobalRouting<IpRoutingProtocol>> globalRouting =
-        CreateObject<GlobalRouting<IpRoutingProtocol>>();
+    Ptr<GlobalRouting<Ipv4RoutingProtocol>> globalRouting =
+        CreateObject<GlobalRouting<Ipv4RoutingProtocol>>();
     globalRouter->SetRoutingProtocol(globalRouting);
 
     return globalRouting;
@@ -62,7 +62,7 @@ Ipv4GlobalRoutingHelper::PrintRoutingPathAt(Time printTime,
                                             Time::Unit unit)
 {
     Simulator::Schedule(printTime,
-                        &GlobalRoutingHelper<T>::PrintRoute,
+                        &Ipv4GlobalRoutingHelper::PrintRoute,
                         sourceNode,
                         dest,
                         stream,
