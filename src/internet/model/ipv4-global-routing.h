@@ -433,6 +433,10 @@ class GlobalRouting : public std::enable_if_t<std::is_same_v<Ipv4RoutingProtocol
     Ptr<Ip> m_ipv4; //!< associated IPv4 instance
 };
 
+/**
+ * @ingroup ipv4
+ * Create the typedef Ipv4GlobalRouting with T as Ipv4RoutingProtocol
+ */
 typedef GlobalRouting<Ipv4RoutingProtocol> Ipv4GlobalRouting;
 
 } // Namespace ns3

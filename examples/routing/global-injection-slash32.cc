@@ -110,7 +110,7 @@ main(int argc, char* argv[])
     // Populate routing tables for nodes nA and nB
     Ipv4GlobalRoutingHelper::PopulateRoutingTables();
     // Inject global routes from Node B, including transit network...
-    Ptr<GlobalRouter<Ipv4Manager>> globalRouterB = nB->GetObject<GlobalRouter<Ipv4Manager>>();
+    Ptr<Ipv4GlobalRouter> globalRouterB = nB->GetObject<Ipv4GlobalRouter>();
     globalRouterB->InjectRoute("10.1.1.4", "255.255.255.252");
     // ...and the host in network "C"
     globalRouterB->InjectRoute("192.168.1.1", "255.255.255.255");

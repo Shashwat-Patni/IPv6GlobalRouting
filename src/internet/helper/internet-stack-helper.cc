@@ -215,10 +215,10 @@ InternetStackHelper::AssignStreams(NodeContainer c, int64_t stream)
     for (auto i = c.Begin(); i != c.End(); ++i)
     {
         Ptr<Node> node = *i;
-        Ptr<GlobalRouter<Ipv4Manager>> router = node->GetObject<GlobalRouter<Ipv4Manager>>();
+        Ptr<Ipv4GlobalRouter> router = node->GetObject<Ipv4GlobalRouter>();
         if (router)
         {
-            Ptr<GlobalRouting<Ipv4RoutingProtocol>> gr = router->GetRoutingProtocol();
+            Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol();
             if (gr)
             {
                 currentStream += gr->AssignStreams(currentStream);
