@@ -31,23 +31,54 @@ template <typename T>
 TypeId
 GlobalRouting<T>::GetTypeId()
 {
-    static TypeId tid =
-        TypeId("ns3::GlobalRouting")
-            .SetParent<Object>()
-            .SetGroupName("Internet")
-            .AddAttribute("RandomEcmpRouting",
-                          "Set to true if packets are randomly routed among ECMP; set to false for "
-                          "using only one route consistently",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&Ipv4GlobalRouting::m_randomEcmpRouting),
-                          MakeBooleanChecker())
-            .AddAttribute("RespondToInterfaceEvents",
-                          "Set to true if you want to dynamically recompute the global routes upon "
-                          "Interface notification events (up/down, or add/remove address)",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&Ipv4GlobalRouting::m_respondToInterfaceEvents),
-                          MakeBooleanChecker());
-    return tid;
+    if (IsIpv4)
+    {
+        static TypeId tid =
+            TypeId("ns3::Ipv4GlobalRouting")
+                .SetParent<Object>()
+                .SetGroupName("Internet")
+                .AddAttribute(
+                    "RandomEcmpRouting",
+                    "Set to true if packets are randomly routed among ECMP; set to false for "
+                    "using only one route consistently",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(&Ipv4GlobalRouting::m_randomEcmpRouting),
+                    MakeBooleanChecker())
+                .AddAttribute(
+                    "RespondToInterfaceEvents",
+                    "Set to true if you want to dynamically recompute the global routes upon "
+                    "Interface notification events (up/down, or add/remove address)",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(&Ipv4GlobalRouting::m_respondToInterfaceEvents),
+                    MakeBooleanChecker());
+        return tid;
+    }
+    else
+    {
+        static TypeId tid =
+            TypeId("ns3::Ipv6GlobalRouting")
+                .SetParent<Object>()
+                .SetGroupName("Internet")
+                .AddAttribute(
+                    "RandomEcmpRouting",
+                    "Set to true if packets are randomly routed among ECMP; set to false for "
+                    "using only one route consistently",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(
+                        &Ipv4GlobalRouting::m_randomEcmpRouting), // need to change this when adding
+                                                                  // ipv6
+                    MakeBooleanChecker())
+                .AddAttribute(
+                    "RespondToInterfaceEvents",
+                    "Set to true if you want to dynamically recompute the global routes upon "
+                    "Interface notification events (up/down, or add/remove address)",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(
+                        &Ipv4GlobalRouting::m_respondToInterfaceEvents), // need to change this when
+                                                                         // adding ipv6
+                    MakeBooleanChecker());
+        return tid;
+    }
 }
 
 template <typename T>
