@@ -2272,12 +2272,11 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
 
     // check if source node has either global Routing or if Listrouting and globalrouting in
     // Listrouting
-    Ptr<Ipv4GlobalRouting> globalRouting =
-        DynamicCast<Ipv4GlobalRouting>(ipv4->GetRoutingProtocol());
+    auto globalRouting = DynamicCast<Ipv4GlobalRouting>(ipv4->GetRoutingProtocol());
 
     if (!globalRouting)
     {
-        Ptr<Ipv4ListRouting> listRouting = DynamicCast<Ipv4ListRouting>(ipv4->GetRoutingProtocol());
+        auto listRouting = DynamicCast<Ipv4ListRouting>(ipv4->GetRoutingProtocol());
 
         // Ensure it's a valid Ipv4ListRouting
         if (listRouting)
@@ -2286,15 +2285,8 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
             {
                 // Initialize priority
                 int16_t priority = 0;
-                Ptr<Ipv4GlobalRouting> tempglobalRouting =
+                globalRouting =
                     DynamicCast<Ipv4GlobalRouting>(listRouting->GetRoutingProtocol(i, priority));
-
-                if (tempglobalRouting)
-                {
-                    // Found a global routing protocol inside the list
-                    globalRouting = tempglobalRouting;
-                    break;
-                }
             }
         }
     }
@@ -2357,12 +2349,10 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
 
         Ptr<Ipv4> ipv4CurrentNode = currentNode->GetObject<Ipv4>();
         uint32_t currentNodeId = currentNode->GetId();
-        Ptr<Ipv4GlobalRouting> router =
-            DynamicCast<Ipv4GlobalRouting>(ipv4CurrentNode->GetRoutingProtocol());
+        auto router = DynamicCast<Ipv4GlobalRouting>(ipv4CurrentNode->GetRoutingProtocol());
         if (!router)
         {
-            Ptr<Ipv4ListRouting> listRouter =
-                DynamicCast<Ipv4ListRouting>(ipv4CurrentNode->GetRoutingProtocol());
+            auto listRouter = DynamicCast<Ipv4ListRouting>(ipv4CurrentNode->GetRoutingProtocol());
 
             // Ensure it's a valid Ipv4ListRouting
             if (listRouter)
@@ -2371,14 +2361,8 @@ GlobalRouteManagerImpl::PrintRoute(Ptr<Node> sourceNode,
                 {
                     // Initialize priority
                     int16_t priority = 0;
-                    Ptr<Ipv4GlobalRouting> tempRouter =
+                    router =
                         DynamicCast<Ipv4GlobalRouting>(listRouter->GetRoutingProtocol(i, priority));
-                    if (tempRouter)
-                    {
-                        // Found a global routing protocol inside the list
-                        router = tempRouter;
-                        break;
-                    }
                 }
             }
         }
