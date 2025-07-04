@@ -522,6 +522,16 @@ class SPFVertex
      */
     void ClearVertexProcessed();
 
+    /**
+     * @brief Set the node pointer corresponding to this Vertex
+     */
+    void SetNode(Ptr<Node> node);
+
+    /**
+     * @brief Get the node pointer corresponding to this Vertex
+     */
+    Ptr<Node> GetNode() const;
+
   private:
     VertexType m_vertexType;                        //!< Vertex type
     Ipv4Address m_vertexId;                         //!< Vertex ID
@@ -536,6 +546,7 @@ class SPFVertex
     ListOfSPFVertex_t m_children;                    //!< Children list
     bool m_vertexProcessed; //!< Flag to note whether vertex has been processed in stage two of SPF
                             //!< computation
+    Ptr<Node> m_Node;       //!< node pointer corresponding to the this Vertex
 
     /**
      * @brief Stream insertion operator.
