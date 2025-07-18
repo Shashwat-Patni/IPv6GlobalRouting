@@ -25,13 +25,10 @@ NS_LOG_COMPONENT_DEFINE("GlobalRouteManager");
 //
 // ---------------------------------------------------------------------------
 
-<<<<<<< HEAD
-uint32_t GlobalRouteManager::routerId = 0;
 
-=======
+uint32_t GlobalRouteManager::routerId = 0; //!< Router ID counter
+
 template <typename T, typename Enable>
->>>>>>> 70a38231a (Templatize GlobalRouteManager)
-
 void
 GlobalRouteManager<T, Enable>::DeleteGlobalRoutes()
 {
@@ -88,8 +85,6 @@ GlobalRouteManager<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
         ->PrintRoutingPath(sourceNode, dest, stream, unit);
 }
 
-template <typename T, typename Enable>
-uint32_t GlobalRouteManager<T, Enable>::routerId = 0; //!< Router ID counter
 
 template class ns3::GlobalRouteManager<ns3::Ipv4Manager>;
 
