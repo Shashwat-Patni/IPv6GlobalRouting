@@ -25,12 +25,12 @@ NS_LOG_COMPONENT_DEFINE("GlobalRouteManager");
 //
 // ---------------------------------------------------------------------------
 
+template <typename T>
+uint32_t GlobalRouteManager<T>::routerId = 0; //!< Router ID counter
 
-uint32_t GlobalRouteManager::routerId = 0; //!< Router ID counter
-
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManager<T, Enable>::DeleteGlobalRoutes()
+GlobalRouteManager<T>::DeleteGlobalRoutes()
 {
     NS_LOG_FUNCTION_NOARGS();
     SimulationSingleton<
@@ -38,9 +38,9 @@ GlobalRouteManager<T, Enable>::DeleteGlobalRoutes()
         ->DeleteGlobalRoutes();
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManager<T, Enable>::BuildGlobalRoutingDatabase()
+GlobalRouteManager<T>::BuildGlobalRoutingDatabase()
 {
     NS_LOG_FUNCTION_NOARGS();
     SimulationSingleton<
@@ -48,9 +48,9 @@ GlobalRouteManager<T, Enable>::BuildGlobalRoutingDatabase()
         ->BuildGlobalRoutingDatabase();
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManager<T, Enable>::InitializeRoutes()
+GlobalRouteManager<T>::InitializeRoutes()
 {
     NS_LOG_FUNCTION_NOARGS();
     SimulationSingleton<
@@ -58,33 +58,32 @@ GlobalRouteManager<T, Enable>::InitializeRoutes()
         ->InitializeRoutes();
 }
 
-template <typename T, typename Enable>
+template <typename T>
 uint32_t
-GlobalRouteManager<T, Enable>::AllocateRouterId()
+GlobalRouteManager<T>::AllocateRouterId()
 {
     NS_LOG_FUNCTION_NOARGS();
     return routerId++;
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManager<T, Enable>::ResetRouterId()
+GlobalRouteManager<T>::ResetRouterId()
 {
     routerId = 0;
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManager<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
-                                                IpAddress dest,
-                                                Ptr<OutputStreamWrapper> stream,
-                                                Time::Unit unit)
+GlobalRouteManager<T>::PrintRoutingPath(Ptr<Node> sourceNode,
+                                        IpAddress dest,
+                                        Ptr<OutputStreamWrapper> stream,
+                                        Time::Unit unit)
 {
     SimulationSingleton<
         GlobalRouteManagerImpl<typename GlobalRouteManager<T, Enable>::IpManager>>::Get()
         ->PrintRoutingPath(sourceNode, dest, stream, unit);
 }
-
 
 template class ns3::GlobalRouteManager<ns3::Ipv4Manager>;
 

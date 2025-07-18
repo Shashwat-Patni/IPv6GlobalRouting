@@ -42,11 +42,11 @@ struct Ipv6Manager
  * The design is guided by OSPFv2 \RFC{2328} section 16.1.1 and quagga ospfd.
  */
 
-template <typename T,
-          typename =
-              std::enable_if_t<std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>>>
+template <typename T>
 class GlobalRouteManager
 {
+    static_assert(std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>,
+                  "T must be either Ipv4Manager or Ipv6Manager when calling GlobalRouteManager");
     /// Alias for determining whether the parent is Ipv4RoutingProtocol or Ipv6RoutingProtocol
     static constexpr bool IsIpv4 = std::is_same_v<Ipv4Manager, T>;
 
@@ -117,9 +117,6 @@ class GlobalRouteManager
      * router ID counter between simulations in the same program run.
      */
     static void ResetRouterId();
-
-  private:
-    static uint32_t routerId; //!< Router ID counter
 };
 
 } // namespace ns3
