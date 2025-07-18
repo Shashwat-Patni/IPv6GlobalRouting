@@ -31,6 +31,7 @@ uint32_t GlobalRouteManager::routerId = 0;
 =======
 template <typename T, typename Enable>
 >>>>>>> 70a38231a (Templatize GlobalRouteManager)
+
 void
 GlobalRouteManager<T, Enable>::DeleteGlobalRoutes()
 {
