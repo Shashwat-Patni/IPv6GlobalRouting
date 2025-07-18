@@ -33,8 +33,7 @@ void
 GlobalRouteManager<T>::DeleteGlobalRoutes()
 {
     NS_LOG_FUNCTION_NOARGS();
-    SimulationSingleton<
-        GlobalRouteManagerImpl<typename GlobalRouteManager<T, Enable>::IpManager>>::Get()
+    SimulationSingleton<GlobalRouteManagerImpl<typename GlobalRouteManager<T>::IpManager>>::Get()
         ->DeleteGlobalRoutes();
 }
 
@@ -43,8 +42,7 @@ void
 GlobalRouteManager<T>::BuildGlobalRoutingDatabase()
 {
     NS_LOG_FUNCTION_NOARGS();
-    SimulationSingleton<
-        GlobalRouteManagerImpl<typename GlobalRouteManager<T, Enable>::IpManager>>::Get()
+    SimulationSingleton<GlobalRouteManagerImpl<typename GlobalRouteManager<T>::IpManager>>::Get()
         ->BuildGlobalRoutingDatabase();
 }
 
@@ -53,8 +51,7 @@ void
 GlobalRouteManager<T>::InitializeRoutes()
 {
     NS_LOG_FUNCTION_NOARGS();
-    SimulationSingleton<
-        GlobalRouteManagerImpl<typename GlobalRouteManager<T, Enable>::IpManager>>::Get()
+    SimulationSingleton<GlobalRouteManagerImpl<typename GlobalRouteManager<T>::IpManager>>::Get()
         ->InitializeRoutes();
 }
 
@@ -80,8 +77,7 @@ GlobalRouteManager<T>::PrintRoutingPath(Ptr<Node> sourceNode,
                                         Ptr<OutputStreamWrapper> stream,
                                         Time::Unit unit)
 {
-    SimulationSingleton<
-        GlobalRouteManagerImpl<typename GlobalRouteManager<T, Enable>::IpManager>>::Get()
+    SimulationSingleton<GlobalRouteManagerImpl<typename GlobalRouteManager<T>::IpManager>>::Get()
         ->PrintRoutingPath(sourceNode, dest, stream, unit);
 }
 
