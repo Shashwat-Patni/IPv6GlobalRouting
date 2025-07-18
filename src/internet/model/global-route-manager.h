@@ -96,8 +96,6 @@ class GlobalRouteManager
      */
     static void ResetRouterId();
 
-  private:
-    static uint32_t routerId; //!< Router ID counter
 
     /**
      *@brief prints the path from this node to the destination node at a particular time.
@@ -111,6 +109,10 @@ class GlobalRouteManager
                                  IpAddress dest,
                                  Ptr<OutputStreamWrapper> stream,
                                  Time::Unit unit);
+
+  private:
+    static uint32_t routerId; //!< Router ID counter
+
 };
 
 } // namespace ns3
