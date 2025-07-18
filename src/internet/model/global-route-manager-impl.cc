@@ -413,16 +413,16 @@ SPFVertex::ClearVertexProcessed()
 // GlobalRouteManagerLSDB Implementation
 //
 // ---------------------------------------------------------------------------
-template <typename T, typename Enable>
-GlobalRouteManagerLSDB<T, Enable>::GlobalRouteManagerLSDB()
+template <typename T>
+GlobalRouteManagerLSDB<T>::GlobalRouteManagerLSDB()
     : m_database(),
       m_extdatabase()
 {
     NS_LOG_FUNCTION(this);
 }
 
-template <typename T, typename Enable>
-GlobalRouteManagerLSDB<T, Enable>::~GlobalRouteManagerLSDB()
+template <typename T>
+GlobalRouteManagerLSDB<T>::~GlobalRouteManagerLSDB()
 {
     NS_LOG_FUNCTION(this);
     for (auto i = m_database.begin(); i != m_database.end(); i++)
@@ -441,9 +441,9 @@ GlobalRouteManagerLSDB<T, Enable>::~GlobalRouteManagerLSDB()
     m_database.clear();
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerLSDB<T, Enable>::Initialize()
+GlobalRouteManagerLSDB<T>::Initialize()
 {
     NS_LOG_FUNCTION(this);
     for (auto i = m_database.begin(); i != m_database.end(); i++)
@@ -453,9 +453,9 @@ GlobalRouteManagerLSDB<T, Enable>::Initialize()
     }
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerLSDB<T, Enable>::Insert(IpAddress addr, GlobalRoutingLSA<IpManager>* lsa)
+GlobalRouteManagerLSDB<T>::Insert(IpAddress addr, GlobalRoutingLSA<IpManager>* lsa)
 {
     NS_LOG_FUNCTION(this << addr << lsa);
     if (lsa->GetLSType() == GlobalRoutingLSA<Ipv4Manager>::ASExternalLSAs)
@@ -468,25 +468,25 @@ GlobalRouteManagerLSDB<T, Enable>::Insert(IpAddress addr, GlobalRoutingLSA<IpMan
     }
 }
 
-template <typename T, typename Enable>
-GlobalRoutingLSA<typename GlobalRouteManagerLSDB<T, Enable>::IpManager>*
-GlobalRouteManagerLSDB<T, Enable>::GetExtLSA(uint32_t index) const
+template <typename T>
+GlobalRoutingLSA<typename GlobalRouteManagerLSDB<T>::IpManager>*
+GlobalRouteManagerLSDB<T>::GetExtLSA(uint32_t index) const
 {
     NS_LOG_FUNCTION(this << index);
     return m_extdatabase.at(index);
 }
 
-template <typename T, typename Enable>
+template <typename T>
 uint32_t
-GlobalRouteManagerLSDB<T, Enable>::GetNumExtLSAs() const
+GlobalRouteManagerLSDB<T>::GetNumExtLSAs() const
 {
     NS_LOG_FUNCTION(this);
     return m_extdatabase.size();
 }
 
-template <typename T, typename Enable>
-GlobalRoutingLSA<typename GlobalRouteManagerLSDB<T, Enable>::IpManager>*
-GlobalRouteManagerLSDB<T, Enable>::GetLSA(IpAddress addr) const
+template <typename T>
+GlobalRoutingLSA<typename GlobalRouteManagerLSDB<T>::IpManager>*
+GlobalRouteManagerLSDB<T>::GetLSA(IpAddress addr) const
 {
     NS_LOG_FUNCTION(this << addr);
     //
@@ -502,9 +502,9 @@ GlobalRouteManagerLSDB<T, Enable>::GetLSA(IpAddress addr) const
     return nullptr;
 }
 
-template <typename T, typename Enable>
-GlobalRoutingLSA<typename GlobalRouteManagerLSDB<T, Enable>::IpManager>*
-GlobalRouteManagerLSDB<T, Enable>::GetLSAByLinkData(IpAddress addr) const
+template <typename T>
+GlobalRoutingLSA<typename GlobalRouteManagerLSDB<T>::IpManager>*
+GlobalRouteManagerLSDB<T>::GetLSAByLinkData(IpAddress addr) const
 {
     NS_LOG_FUNCTION(this << addr);
     //
@@ -533,16 +533,16 @@ GlobalRouteManagerLSDB<T, Enable>::GetLSAByLinkData(IpAddress addr) const
 //
 // ---------------------------------------------------------------------------
 
-template <typename T, typename Enable>
-GlobalRouteManagerImpl<T, Enable>::GlobalRouteManagerImpl()
+template <typename T>
+GlobalRouteManagerImpl<T>::GlobalRouteManagerImpl()
     : m_spfroot(nullptr)
 {
     NS_LOG_FUNCTION(this);
     m_lsdb = new GlobalRouteManagerLSDB<IpManager>();
 }
 
-template <typename T, typename Enable>
-GlobalRouteManagerImpl<T, Enable>::~GlobalRouteManagerImpl()
+template <typename T>
+GlobalRouteManagerImpl<T>::~GlobalRouteManagerImpl()
 {
     NS_LOG_FUNCTION(this);
     if (m_lsdb)
@@ -551,9 +551,9 @@ GlobalRouteManagerImpl<T, Enable>::~GlobalRouteManagerImpl()
     }
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::DebugUseLsdb(GlobalRouteManagerLSDB<T, Enable>* lsdb)
+GlobalRouteManagerImpl<T>::DebugUseLsdb(GlobalRouteManagerLSDB<T>* lsdb)
 {
     NS_LOG_FUNCTION(this << lsdb);
     if (m_lsdb)
@@ -563,9 +563,9 @@ GlobalRouteManagerImpl<T, Enable>::DebugUseLsdb(GlobalRouteManagerLSDB<T, Enable
     m_lsdb = lsdb;
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::DeleteGlobalRoutes()
+GlobalRouteManagerImpl<T>::DeleteGlobalRoutes()
 {
     NS_LOG_FUNCTION(this);
     for (auto i = NodeList::Begin(); i != NodeList::End(); i++)
@@ -608,9 +608,9 @@ GlobalRouteManagerImpl<T, Enable>::DeleteGlobalRoutes()
 // ultimately be computed.
 //
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::BuildGlobalRoutingDatabase()
+GlobalRouteManagerImpl<T>::BuildGlobalRoutingDatabase()
 {
     NS_LOG_FUNCTION(this);
     //
@@ -692,9 +692,9 @@ GlobalRouteManagerImpl<T, Enable>::BuildGlobalRoutingDatabase()
 // list becomes empty.
 //
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::InitializeRoutes()
+GlobalRouteManagerImpl<T>::InitializeRoutes()
 {
     NS_LOG_FUNCTION(this);
     //
@@ -743,9 +743,9 @@ GlobalRouteManagerImpl<T, Enable>::InitializeRoutes()
 // vertex already on the candidate list, store the new (lower) cost.
 //
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFNext(SPFVertex* v, CandidateQueue& candidate)
+GlobalRouteManagerImpl<T>::SPFNext(SPFVertex* v, CandidateQueue& candidate)
 {
     NS_LOG_FUNCTION(this << v << &candidate);
 
@@ -976,12 +976,12 @@ GlobalRouteManagerImpl<T, Enable>::SPFNext(SPFVertex* v, CandidateQueue& candida
 // For now, this is greatly simplified from the quagga code
 //
 
-template <typename T, typename Enable>
+template <typename T>
 int
-GlobalRouteManagerImpl<T, Enable>::SPFNexthopCalculation(SPFVertex* v,
-                                                         SPFVertex* w,
-                                                         GlobalRoutingLinkRecord<IpManager>* l,
-                                                         uint32_t distance)
+GlobalRouteManagerImpl<T>::SPFNexthopCalculation(SPFVertex* v,
+                                                 SPFVertex* w,
+                                                 GlobalRoutingLinkRecord<IpManager>* l,
+                                                 uint32_t distance)
 {
     NS_LOG_FUNCTION(this << v << w << l << distance);
     //
@@ -1162,12 +1162,12 @@ GlobalRouteManagerImpl<T, Enable>::SPFNexthopCalculation(SPFVertex* v,
 // representing a possible *second* link from <v> to <w>.
 //
 
-template <typename T, typename Enable>
+template <typename T>
 
-GlobalRoutingLinkRecord<typename GlobalRouteManagerImpl<T, Enable>::IpManager>*
-GlobalRouteManagerImpl<T, Enable>::SPFGetNextLink(SPFVertex* v,
-                                                  SPFVertex* w,
-                                                  GlobalRoutingLinkRecord<IpManager>* prev_link)
+GlobalRoutingLinkRecord<typename GlobalRouteManagerImpl<T>::IpManager>*
+GlobalRouteManagerImpl<T>::SPFGetNextLink(SPFVertex* v,
+                                          SPFVertex* w,
+                                          GlobalRoutingLinkRecord<IpManager>* prev_link)
 {
     NS_LOG_FUNCTION(this << v << w << prev_link);
 
@@ -1242,9 +1242,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFGetNextLink(SPFVertex* v,
 // Used for unit tests.
 //
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::DebugSPFCalculate(IpAddress root)
+GlobalRouteManagerImpl<T>::DebugSPFCalculate(IpAddress root)
 {
     NS_LOG_FUNCTION(this << root);
     SPFCalculate(root);
@@ -1257,9 +1257,9 @@ GlobalRouteManagerImpl<T, Enable>::DebugSPFCalculate(IpAddress root)
 // to be run
 //
 
-template <typename T, typename Enable>
+template <typename T>
 bool
-GlobalRouteManagerImpl<T, Enable>::CheckForStubNode(IpAddress root)
+GlobalRouteManagerImpl<T>::CheckForStubNode(IpAddress root)
 {
     NS_LOG_FUNCTION(this << root);
     GlobalRoutingLSA<IpManager>* rlsa = m_lsdb->GetLSA(root);
@@ -1341,9 +1341,9 @@ GlobalRouteManagerImpl<T, Enable>::CheckForStubNode(IpAddress root)
 
 // quagga ospf_spf_calculate
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFCalculate(IpAddress root)
+GlobalRouteManagerImpl<T>::SPFCalculate(IpAddress root)
 {
     NS_LOG_FUNCTION(this << root);
 
@@ -1507,10 +1507,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFCalculate(IpAddress root)
     m_spfroot = nullptr;
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::ProcessASExternals(SPFVertex* v,
-                                                      GlobalRoutingLSA<IpManager>* extlsa)
+GlobalRouteManagerImpl<T>::ProcessASExternals(SPFVertex* v, GlobalRoutingLSA<IpManager>* extlsa)
 {
     NS_LOG_FUNCTION(this << v << extlsa);
     NS_LOG_LOGIC("Processing external for destination "
@@ -1542,10 +1541,9 @@ GlobalRouteManagerImpl<T, Enable>::ProcessASExternals(SPFVertex* v,
 // SPFAddIntraAddStub()
 //
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFAddASExternal(GlobalRoutingLSA<IpManager>* extlsa,
-                                                    SPFVertex* v)
+GlobalRouteManagerImpl<T>::SPFAddASExternal(GlobalRoutingLSA<IpManager>* extlsa, SPFVertex* v)
 {
     NS_LOG_FUNCTION(this << extlsa << v);
 
@@ -1670,9 +1668,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFAddASExternal(GlobalRoutingLSA<IpManager>*
 // stub link records will exist for point-to-point interfaces and for
 // broadcast interfaces for which no neighboring router can be found
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFProcessStubs(SPFVertex* v)
+GlobalRouteManagerImpl<T>::SPFProcessStubs(SPFVertex* v)
 {
     NS_LOG_FUNCTION(this << v);
     NS_LOG_LOGIC("Processing stubs for " << v->GetVertexId());
@@ -1705,10 +1703,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFProcessStubs(SPFVertex* v)
 
 // RFC2328 16.1. second stage.
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFIntraAddStub(GlobalRoutingLinkRecord<IpManager>* l,
-                                                   SPFVertex* v)
+GlobalRouteManagerImpl<T>::SPFIntraAddStub(GlobalRoutingLinkRecord<IpManager>* l, SPFVertex* v)
 {
     NS_LOG_FUNCTION(this << l << v);
 
@@ -1843,9 +1840,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFIntraAddStub(GlobalRoutingLinkRecord<IpMan
 // for routing assumes -1 to be a legal return value)
 //
 
-template <typename T, typename Enable>
+template <typename T>
 int32_t
-GlobalRouteManagerImpl<T, Enable>::FindOutgoingInterfaceId(IpAddress a, IpMaskOrPrefix amask)
+GlobalRouteManagerImpl<T>::FindOutgoingInterfaceId(IpAddress a, IpMaskOrPrefix amask)
 {
     NS_LOG_FUNCTION(this << a << amask);
     //
@@ -1929,9 +1926,9 @@ GlobalRouteManagerImpl<T, Enable>::FindOutgoingInterfaceId(IpAddress a, IpMaskOr
 // route.
 //
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFIntraAddRouter(SPFVertex* v)
+GlobalRouteManagerImpl<T>::SPFIntraAddRouter(SPFVertex* v)
 {
     NS_LOG_FUNCTION(this << v);
 
@@ -2073,9 +2070,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFIntraAddRouter(SPFVertex* v)
     }
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFIntraAddTransit(SPFVertex* v)
+GlobalRouteManagerImpl<T>::SPFIntraAddTransit(SPFVertex* v)
 {
     NS_LOG_FUNCTION(this << v);
 
@@ -2188,9 +2185,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFIntraAddTransit(SPFVertex* v)
 // already has set and adds itself to that vertex's list of children.
 //
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::SPFVertexAddParent(SPFVertex* v)
+GlobalRouteManagerImpl<T>::SPFVertexAddParent(SPFVertex* v)
 {
     NS_LOG_FUNCTION(this << v);
 
@@ -2206,9 +2203,9 @@ GlobalRouteManagerImpl<T, Enable>::SPFVertexAddParent(SPFVertex* v)
     }
 }
 
-template <typename T, typename Enable>
+template <typename T>
 Ptr<Node>
-GlobalRouteManagerImpl<T, Enable>::GetNodeByIP(IpAddress address)
+GlobalRouteManagerImpl<T>::GetNodeByIP(IpAddress address)
 {
     // iterate through the list of nodes
     for (auto i = NodeList::Begin(); i != NodeList::End(); ++i)
@@ -2228,12 +2225,12 @@ GlobalRouteManagerImpl<T, Enable>::GetNodeByIP(IpAddress address)
     return nullptr; // If no node with the given IP address was found
 }
 
-template <typename T, typename Enable>
+template <typename T>
 void
-GlobalRouteManagerImpl<T, Enable>::PrintRoutingPath(Ptr<Node> sourceNode,
-                                                    IpAddress dest,
-                                                    Ptr<OutputStreamWrapper> stream,
-                                                    Time::Unit unit)
+GlobalRouteManagerImpl<T>::PrintRoutingPath(Ptr<Node> sourceNode,
+                                            IpAddress dest,
+                                            Ptr<OutputStreamWrapper> stream,
+                                            Time::Unit unit)
 {
     NS_LOG_FUNCTION(this << sourceNode << dest);
 

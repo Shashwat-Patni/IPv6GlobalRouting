@@ -566,11 +566,11 @@ class SPFVertex
  * This class implements a searchable database of LSAs gathered from every
  * router in the simulation.
  */
-template <typename T,
-          typename Enable =
-              std::enable_if_t<std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>>>
+template <typename T>
 class GlobalRouteManagerLSDB
 {
+    static_assert(std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>,
+                  "T must be either Ipv4Manager or Ipv6Manager In GlobalRouteManagerLSDB");
     /// Alias for determining whether the parent is Ipv4RoutingProtocol or Ipv6RoutingProtocol
     static constexpr bool IsIpv4 = std::is_same_v<Ipv4Manager, T>;
 
@@ -724,11 +724,12 @@ class GlobalRouteManagerLSDB
  *
  * The design is guided by OSPFv2 \RFC{2328} section 16.1.1 and quagga ospfd.
  */
-template <typename T,
-          typename Enable =
-              std::enable_if_t<std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>>>
+template <typename T>
 class GlobalRouteManagerImpl
 {
+    static_assert(
+        std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>,
+        "T must be either Ipv4Manager or Ipv6Manager when calling GlobalRouteManagerImpl");
     /// Alias for determining whether the parent is Ipv4RoutingProtocol or Ipv6RoutingProtocol
     static constexpr bool IsIpv4 = std::is_same_v<Ipv4Manager, T>;
 
@@ -804,7 +805,7 @@ class GlobalRouteManagerImpl
      * @brief Debugging routine; allow client code to supply a pre-built LSDB
      * @param lsdb the pre-built LSDB
      */
-    void DebugUseLsdb(GlobalRouteManagerLSDB<T, Enable>* lsdb);
+    void DebugUseLsdb(GlobalRouteManagerLSDB<T>* lsdb);
 
     /**
      * @brief Debugging routine; call the core SPF from the unit tests
