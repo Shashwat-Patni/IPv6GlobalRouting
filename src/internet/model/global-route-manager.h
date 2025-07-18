@@ -111,12 +111,6 @@ class GlobalRouteManager
                                  IpAddress dest,
                                  Ptr<OutputStreamWrapper> stream,
                                  Time::Unit unit);
-
-    /**
-     * @brief Reset the router ID counter to zero. This is the only way to reset the
-     * router ID counter between simulations in the same program run.
-     */
-    static void ResetRouterId();
 };
 
 } // namespace ns3
