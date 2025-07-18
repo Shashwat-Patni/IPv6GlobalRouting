@@ -69,7 +69,7 @@ class GlobalRouting : public std::enable_if_t<std::is_same_v<Ipv4RoutingProtocol
                                                   std::is_same_v<Ipv6RoutingProtocol, T>,
                                               T>
 {
-    template <typename, typename>
+    template <typename>
     friend class GlobalRouteManagerImpl;
 
     /// Alias for determining whether the parent is Ipv4RoutingHelper or Ipv6RoutingHelper
