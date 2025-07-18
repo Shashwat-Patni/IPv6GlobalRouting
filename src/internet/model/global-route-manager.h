@@ -96,7 +96,6 @@ class GlobalRouteManager
      */
     static void ResetRouterId();
 
-
     /**
      *@brief prints the path from this node to the destination node at a particular time.
      * @param sourceNode The IPv4 address of the source node.
@@ -112,7 +111,6 @@ class GlobalRouteManager
 
   private:
     static uint32_t routerId; //!< Router ID counter
-
 };
 
 } // namespace ns3
