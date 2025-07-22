@@ -11,8 +11,13 @@
 #define GLOBAL_ROUTE_MANAGER_IMPL_H
 
 #include "global-router-interface.h"
+#include "ipv4-l3-protocol.h"
+#include "ipv4-routing-protocol.h"
+#include "ipv6-l3-protocol.h"
+#include "ipv6-routing-protocol.h"
 
 #include "ns3/ipv4-address.h"
+#include "ns3/ipv4-routing-helper.h"
 #include "ns3/object.h"
 #include "ns3/ptr.h"
 
@@ -28,7 +33,8 @@ namespace ns3
 const uint32_t SPF_INFINITY = 0xffffffff; //!< "infinite" distance between nodes
 
 class CandidateQueue;
-class Ipv4GlobalRouting;
+template <typename>
+class GlobalRouting;
 
 /**
  * @ingroup globalrouting
@@ -103,7 +109,7 @@ class SPFVertex
      * @see GlobalRoutingLSA
      * @param lsa The Link State Advertisement used for finding initial values.
      */
-    SPFVertex(GlobalRoutingLSA* lsa);
+    SPFVertex(GlobalRoutingLSA<Ipv4Manager>* lsa);
 
     /**
      * @brief Destroy an SPFVertex (Shortest Path First Vertex).
@@ -182,7 +188,7 @@ class SPFVertex
      * @returns A pointer to the GlobalRoutingLSA found by the router represented
      * by this SPFVertex object.
      */
-    GlobalRoutingLSA* GetLSA() const;
+    GlobalRoutingLSA<Ipv4Manager>* GetLSA() const;
 
     /**
      * @brief Set the Global Router Link State Advertisement returned by the
@@ -197,7 +203,7 @@ class SPFVertex
      * must not delete the LSA after calling this method.
      * @param lsa A pointer to the GlobalRoutingLSA.
      */
-    void SetLSA(GlobalRoutingLSA* lsa);
+    void SetLSA(GlobalRoutingLSA<Ipv4Manager>* lsa);
 
     /**
      * @brief Get the distance from the root vertex to "this" SPFVertex object.
@@ -524,11 +530,11 @@ class SPFVertex
 
   private:
     VertexType m_vertexType;                        //!< Vertex type
-    Ipv4Address m_vertexId;                         //!< Vertex ID
-    GlobalRoutingLSA* m_lsa;                        //!< Link State Advertisement
+    Ipv4Address m_v4VertexId;                       //!< Vertex ID
+    GlobalRoutingLSA<Ipv4Manager>* m_v4Lsa;         //!< Link State Advertisement
     uint32_t m_distanceFromRoot;                    //!< Distance from root node
     int32_t m_rootOif;                              //!< root Output Interface
-    Ipv4Address m_nextHop;                          //!< next hop
+    Ipv4Address m_v4NextHop;                        //!< next hop
     typedef std::list<NodeExit_t> ListOfNodeExit_t; //!< container of Exit nodes
     ListOfNodeExit_t m_ecmpRootExits; //!< store the multiple root's exits for supporting ECMP
     typedef std::list<SPFVertex*> ListOfSPFVertex_t; //!< container of SPFVertex items
@@ -560,8 +566,43 @@ class SPFVertex
  * This class implements a searchable database of LSAs gathered from every
  * router in the simulation.
  */
+template <typename T>
 class GlobalRouteManagerLSDB
 {
+    static_assert(std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>,
+                  "T must be either Ipv4Manager or Ipv6Manager In GlobalRouteManagerLSDB");
+    /// Alias for determining whether the parent is Ipv4RoutingProtocol or Ipv6RoutingProtocol
+    static constexpr bool IsIpv4 = std::is_same_v<Ipv4Manager, T>;
+
+    /// Alias for Ipv4Manager and Ipv6Manager classes
+    using IpManager = typename std::conditional_t<IsIpv4, Ipv4Manager, Ipv6Manager>;
+
+    /// Alias for Ipv4 and Ipv6 classes
+    using Ip = typename std::conditional_t<IsIpv4, Ipv4, Ipv6>;
+
+    /// Alias for Ipv4Address and Ipv6Address classes
+    using IpAddress = typename std::conditional_t<IsIpv4, Ipv4Address, Ipv6Address>;
+
+    /// Alias for Ipv4Route and Ipv6Route classes
+    using IpRoute = typename std::conditional_t<IsIpv4, Ipv4Route, Ipv6Route>;
+
+    /// Alias for Ipv4AddressHash and Ipv6AddressHash classes
+    using IpAddressHash = typename std::conditional_t<IsIpv4, Ipv4AddressHash, Ipv6AddressHash>;
+
+    /// Alias for Ipv4Header and Ipv6Header classes
+    using IpHeader = typename std::conditional_t<IsIpv4, Ipv4Header, Ipv6Header>;
+
+    /// Alias for Ipv4InterfaceAddress and Ipv6InterfaceAddress classes
+    using IpInterfaceAddress =
+        typename std::conditional_t<IsIpv4, Ipv4InterfaceAddress, Ipv6InterfaceAddress>;
+
+    /// Alias for Ipv4RoutingTableEntry and Ipv6RoutingTableEntry classes
+    using IpRoutingTableEntry =
+        typename std::conditional_t<IsIpv4, Ipv4RoutingTableEntry, Ipv6RoutingTableEntry>;
+
+    /// Alias for Ipv4Mask And Ipv6Prefix
+    using IpMaskOrPrefix = typename std::conditional_t<IsIpv4, Ipv4Mask, Ipv6Prefix>;
+
   public:
     /**
      * @brief Construct an empty Global Router Manager Link State Database.
@@ -597,7 +638,7 @@ class GlobalRouteManagerLSDB
      * ID.
      * @param lsa A pointer to the Link State Advertisement for the router.
      */
-    void Insert(Ipv4Address addr, GlobalRoutingLSA* lsa);
+    void Insert(IpAddress addr, GlobalRoutingLSA<IpManager>* lsa);
 
     /**
      * @brief Look up the Link State Advertisement associated with the given
@@ -613,7 +654,7 @@ class GlobalRouteManagerLSDB
      * @returns A pointer to the Link State Advertisement for the router specified
      * by the IP address addr.
      */
-    GlobalRoutingLSA* GetLSA(Ipv4Address addr) const;
+    GlobalRoutingLSA<IpManager>* GetLSA(IpAddress addr) const;
     /**
      * @brief Look up the Link State Advertisement associated with the given
      * link state ID (address).  This is a variation of the GetLSA call
@@ -626,7 +667,7 @@ class GlobalRouteManagerLSDB
      * by the IP address addr.
      * ID.
      */
-    GlobalRoutingLSA* GetLSAByLinkData(Ipv4Address addr) const;
+    GlobalRoutingLSA<IpManager>* GetLSAByLinkData(IpAddress addr) const;
 
     /**
      * @brief Set all LSA flags to an initialized state, for SPF computation
@@ -652,7 +693,7 @@ class GlobalRouteManagerLSDB
      * @param index the index associated with the LSA.
      * @returns A pointer to the Link State Advertisement.
      */
-    GlobalRoutingLSA* GetExtLSA(uint32_t index) const;
+    GlobalRoutingLSA<IpManager>* GetExtLSA(uint32_t index) const;
     /**
      * @brief Get the number of External Link State Advertisements.
      *
@@ -662,13 +703,13 @@ class GlobalRouteManagerLSDB
     uint32_t GetNumExtLSAs() const;
 
   private:
-    typedef std::map<Ipv4Address, GlobalRoutingLSA*>
+    typedef std::map<IpAddress, GlobalRoutingLSA<IpManager>*>
         LSDBMap_t; //!< container of IPv4 addresses / Link State Advertisements
-    typedef std::pair<Ipv4Address, GlobalRoutingLSA*>
+    typedef std::pair<IpAddress, GlobalRoutingLSA<IpManager>*>
         LSDBPair_t; //!< pair of IPv4 addresses / Link State Advertisements
 
     LSDBMap_t m_database; //!< database of IPv4 addresses / Link State Advertisements
-    std::vector<GlobalRoutingLSA*>
+    std::vector<GlobalRoutingLSA<IpManager>*>
         m_extdatabase; //!< database of External Link State Advertisements
 };
 
@@ -683,8 +724,54 @@ class GlobalRouteManagerLSDB
  *
  * The design is guided by OSPFv2 \RFC{2328} section 16.1.1 and quagga ospfd.
  */
+template <typename T>
 class GlobalRouteManagerImpl
 {
+    static_assert(
+        std::is_same_v<T, Ipv4Manager> || std::is_same_v<T, Ipv6Manager>,
+        "T must be either Ipv4Manager or Ipv6Manager when calling GlobalRouteManagerImpl");
+    /// Alias for determining whether the parent is Ipv4RoutingProtocol or Ipv6RoutingProtocol
+    static constexpr bool IsIpv4 = std::is_same_v<Ipv4Manager, T>;
+
+    /// Alias for Ipv4 and Ipv6 classes
+    using Ip = typename std::conditional_t<IsIpv4, Ipv4, Ipv6>;
+
+    /// Alias for Ipv4Manager and Ipv6Manager classes
+    using IpManager = typename std::conditional_t<IsIpv4, Ipv4Manager, Ipv6Manager>;
+
+    /// Alias for Ipv4Address and Ipv6Address classes
+    using IpAddress = typename std::conditional_t<IsIpv4, Ipv4Address, Ipv6Address>;
+
+    /// Alias for Ipv4Route and Ipv6Route classes
+    using IpRoute = typename std::conditional_t<IsIpv4, Ipv4Route, Ipv6Route>;
+
+    /// Alias for Ipv4AddressHash and Ipv6AddressHash classes
+    using IpAddressHash = typename std::conditional_t<IsIpv4, Ipv4AddressHash, Ipv6AddressHash>;
+
+    /// Alias for Ipv4Header and Ipv6Header classes
+    using IpHeader = typename std::conditional_t<IsIpv4, Ipv4Header, Ipv6Header>;
+
+    /// Alias for Ipv4InterfaceAddress and Ipv6InterfaceAddress classes
+    using IpInterfaceAddress =
+        typename std::conditional_t<IsIpv4, Ipv4InterfaceAddress, Ipv6InterfaceAddress>;
+
+    /// Alias for Ipv4RoutingTableEntry and Ipv6RoutingTableEntry classes
+    using IpRoutingTableEntry =
+        typename std::conditional_t<IsIpv4, Ipv4RoutingTableEntry, Ipv6RoutingTableEntry>;
+
+    /// Alias for Ipv4Mask And Ipv6Prefix
+    using IpMaskOrPrefix = typename std::conditional_t<IsIpv4, Ipv4Mask, Ipv6Prefix>;
+
+    /// Alias for Ipv4ListRouting and Ipv6ListRouting classes
+    using IpListRouting = typename std::conditional_t<IsIpv4, Ipv4ListRouting, Ipv6ListRouting>;
+
+    /// Alias for Ipv4l3Protocol and Ipv6l3Protocol classes
+    using IpL3Protocol = typename std::conditional_t<IsIpv4, Ipv4L3Protocol, Ipv6L3Protocol>;
+
+    /// Alias for Ipv4RoutingProtocol and Ipv6RoutingProtocol classes
+    using IpRoutingProtocol =
+        typename std::conditional_t<IsIpv4, Ipv4RoutingProtocol, Ipv6RoutingProtocol>;
+
   public:
     GlobalRouteManagerImpl();
     virtual ~GlobalRouteManagerImpl();
@@ -718,17 +805,18 @@ class GlobalRouteManagerImpl
      * @brief Debugging routine; allow client code to supply a pre-built LSDB
      * @param lsdb the pre-built LSDB
      */
-    void DebugUseLsdb(GlobalRouteManagerLSDB* lsdb);
+    void DebugUseLsdb(GlobalRouteManagerLSDB<T>* lsdb);
 
     /**
      * @brief Debugging routine; call the core SPF from the unit tests
      * @param root the root node to start calculations
      */
-    void DebugSPFCalculate(Ipv4Address root);
+    void DebugSPFCalculate(IpAddress root);
 
   private:
-    SPFVertex* m_spfroot;           //!< the root node
-    GlobalRouteManagerLSDB* m_lsdb; //!< the Link State DataBase (LSDB) of the Global Route Manager
+    SPFVertex* m_spfroot; //!< the root node
+    GlobalRouteManagerLSDB<IpManager>*
+        m_lsdb; //!< the Link State DataBase (LSDB) of the Global Route Manager
 
     /**
      * @brief Test if a node is a stub, from an OSPF sense.
@@ -740,7 +828,7 @@ class GlobalRouteManagerImpl
      * @param root the root node
      * @returns true if the node is a stub
      */
-    bool CheckForStubNode(Ipv4Address root);
+    bool CheckForStubNode(IpAddress root);
 
     /**
      * @brief Calculate the shortest path first (SPF) tree
@@ -748,7 +836,7 @@ class GlobalRouteManagerImpl
      * Equivalent to quagga ospf_spf_calculate
      * @param root the root node
      */
-    void SPFCalculate(Ipv4Address root);
+    void SPFCalculate(IpAddress root);
 
     /**
      * @brief Process Stub nodes
@@ -767,7 +855,7 @@ class GlobalRouteManagerImpl
      * @param v vertex to be processed
      * @param extlsa external LSA
      */
-    void ProcessASExternals(SPFVertex* v, GlobalRoutingLSA* extlsa);
+    void ProcessASExternals(SPFVertex* v, GlobalRoutingLSA<IpManager>* extlsa);
 
     /**
      * @brief Examine the links in v's LSA and update the list of candidates with any
@@ -807,7 +895,7 @@ class GlobalRouteManagerImpl
      */
     int SPFNexthopCalculation(SPFVertex* v,
                               SPFVertex* w,
-                              GlobalRoutingLinkRecord* l,
+                              GlobalRoutingLinkRecord<IpManager>* l,
                               uint32_t distance);
 
     /**
@@ -845,9 +933,10 @@ class GlobalRouteManagerImpl
      * @param prev_link the previous link in the list
      * @returns the link's record
      */
-    GlobalRoutingLinkRecord* SPFGetNextLink(SPFVertex* v,
-                                            SPFVertex* w,
-                                            GlobalRoutingLinkRecord* prev_link);
+    GlobalRoutingLinkRecord<IpManager>* SPFGetNextLink(
+        SPFVertex* v,
+        SPFVertex* w,
+        GlobalRoutingLinkRecord<IpManager>* prev_link);
 
     /**
      * @brief Add a host route to the routing tables
@@ -886,7 +975,7 @@ class GlobalRouteManagerImpl
      * @param l the global routing link record
      * @param v the vertex
      */
-    void SPFIntraAddStub(GlobalRoutingLinkRecord* l, SPFVertex* v);
+    void SPFIntraAddStub(GlobalRoutingLinkRecord<IpManager>* l, SPFVertex* v);
 
     /**
      * @brief Add an external route to the routing tables
@@ -894,7 +983,7 @@ class GlobalRouteManagerImpl
      * @param extlsa the external LSA
      * @param v the vertex
      */
-    void SPFAddASExternal(GlobalRoutingLSA* extlsa, SPFVertex* v);
+    void SPFAddASExternal(GlobalRoutingLSA<IpManager>* extlsa, SPFVertex* v);
 
     /**
      * @brief Return the interface number corresponding to a given IP address and mask
@@ -908,7 +997,7 @@ class GlobalRouteManagerImpl
      * @param amask the target subnet mask
      * @return the outgoing interface number
      */
-    int32_t FindOutgoingInterfaceId(Ipv4Address a, Ipv4Mask amask = Ipv4Mask("255.255.255.255"));
+    int32_t FindOutgoingInterfaceId(IpAddress a, IpMaskOrPrefix amask = IpMaskOrPrefix::GetOnes());
 };
 
 } // namespace ns3

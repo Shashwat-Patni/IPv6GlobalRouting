@@ -25,33 +25,64 @@
 namespace ns3
 {
 
-NS_LOG_COMPONENT_DEFINE("Ipv4GlobalRouting");
+NS_LOG_COMPONENT_DEFINE("GlobalRouting");
 
-NS_OBJECT_ENSURE_REGISTERED(Ipv4GlobalRouting);
-
+template <typename T>
 TypeId
-Ipv4GlobalRouting::GetTypeId()
+GlobalRouting<T>::GetTypeId()
 {
-    static TypeId tid =
-        TypeId("ns3::Ipv4GlobalRouting")
-            .SetParent<Object>()
-            .SetGroupName("Internet")
-            .AddAttribute("RandomEcmpRouting",
-                          "Set to true if packets are randomly routed among ECMP; set to false for "
-                          "using only one route consistently",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&Ipv4GlobalRouting::m_randomEcmpRouting),
-                          MakeBooleanChecker())
-            .AddAttribute("RespondToInterfaceEvents",
-                          "Set to true if you want to dynamically recompute the global routes upon "
-                          "Interface notification events (up/down, or add/remove address)",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&Ipv4GlobalRouting::m_respondToInterfaceEvents),
-                          MakeBooleanChecker());
-    return tid;
+    if (IsIpv4)
+    {
+        static TypeId tid =
+            TypeId("ns3::Ipv4GlobalRouting")
+                .SetParent<Object>()
+                .SetGroupName("Internet")
+                .AddAttribute(
+                    "RandomEcmpRouting",
+                    "Set to true if packets are randomly routed among ECMP; set to false for "
+                    "using only one route consistently",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(&Ipv4GlobalRouting::m_randomEcmpRouting),
+                    MakeBooleanChecker())
+                .AddAttribute(
+                    "RespondToInterfaceEvents",
+                    "Set to true if you want to dynamically recompute the global routes upon "
+                    "Interface notification events (up/down, or add/remove address)",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(&Ipv4GlobalRouting::m_respondToInterfaceEvents),
+                    MakeBooleanChecker());
+        return tid;
+    }
+    else
+    {
+        static TypeId tid =
+            TypeId("ns3::Ipv6GlobalRouting")
+                .SetParent<Object>()
+                .SetGroupName("Internet")
+                .AddAttribute(
+                    "RandomEcmpRouting",
+                    "Set to true if packets are randomly routed among ECMP; set to false for "
+                    "using only one route consistently",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(
+                        &Ipv4GlobalRouting::m_randomEcmpRouting), // need to change this when adding
+                                                                  // ipv6
+                    MakeBooleanChecker())
+                .AddAttribute(
+                    "RespondToInterfaceEvents",
+                    "Set to true if you want to dynamically recompute the global routes upon "
+                    "Interface notification events (up/down, or add/remove address)",
+                    BooleanValue(false),
+                    MakeBooleanAccessor(
+                        &Ipv4GlobalRouting::m_respondToInterfaceEvents), // need to change this when
+                                                                         // adding ipv6
+                    MakeBooleanChecker());
+        return tid;
+    }
 }
 
-Ipv4GlobalRouting::Ipv4GlobalRouting()
+template <typename T>
+GlobalRouting<T>::GlobalRouting()
     : m_randomEcmpRouting(false),
       m_respondToInterfaceEvents(false)
 {
@@ -60,70 +91,79 @@ Ipv4GlobalRouting::Ipv4GlobalRouting()
     m_rand = CreateObject<UniformRandomVariable>();
 }
 
-Ipv4GlobalRouting::~Ipv4GlobalRouting()
+template <typename T>
+GlobalRouting<T>::~GlobalRouting()
 {
     NS_LOG_FUNCTION(this);
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::AddHostRouteTo(Ipv4Address dest, Ipv4Address nextHop, uint32_t interface)
+GlobalRouting<T>::AddHostRouteTo(IpAddress dest, IpAddress nextHop, uint32_t interface)
 {
     NS_LOG_FUNCTION(this << dest << nextHop << interface);
-    auto route = new Ipv4RoutingTableEntry();
-    *route = Ipv4RoutingTableEntry::CreateHostRouteTo(dest, nextHop, interface);
+    auto route = new IpRoutingTableEntry();
+    *route = IpRoutingTableEntry::CreateHostRouteTo(dest, nextHop, interface);
     m_hostRoutes.push_back(route);
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::AddHostRouteTo(Ipv4Address dest, uint32_t interface)
+GlobalRouting<T>::AddHostRouteTo(IpAddress dest, uint32_t interface)
 {
     NS_LOG_FUNCTION(this << dest << interface);
-    auto route = new Ipv4RoutingTableEntry();
-    *route = Ipv4RoutingTableEntry::CreateHostRouteTo(dest, interface);
+    auto route = new IpRoutingTableEntry();
+    *route = IpRoutingTableEntry::CreateHostRouteTo(dest, interface);
     m_hostRoutes.push_back(route);
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::AddNetworkRouteTo(Ipv4Address network,
-                                     Ipv4Mask networkMask,
-                                     Ipv4Address nextHop,
-                                     uint32_t interface)
+GlobalRouting<T>::AddNetworkRouteTo(IpAddress network,
+                                    IpMaskOrPrefix networkMask,
+                                    IpAddress nextHop,
+                                    uint32_t interface)
 {
     NS_LOG_FUNCTION(this << network << networkMask << nextHop << interface);
-    auto route = new Ipv4RoutingTableEntry();
-    *route = Ipv4RoutingTableEntry::CreateNetworkRouteTo(network, networkMask, nextHop, interface);
+    auto route = new IpRoutingTableEntry();
+    *route = IpRoutingTableEntry::CreateNetworkRouteTo(network, networkMask, nextHop, interface);
     m_networkRoutes.push_back(route);
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::AddNetworkRouteTo(Ipv4Address network, Ipv4Mask networkMask, uint32_t interface)
+GlobalRouting<T>::AddNetworkRouteTo(IpAddress network,
+                                    IpMaskOrPrefix networkMask,
+                                    uint32_t interface)
 {
     NS_LOG_FUNCTION(this << network << networkMask << interface);
-    auto route = new Ipv4RoutingTableEntry();
-    *route = Ipv4RoutingTableEntry::CreateNetworkRouteTo(network, networkMask, interface);
+    auto route = new IpRoutingTableEntry();
+    *route = IpRoutingTableEntry::CreateNetworkRouteTo(network, networkMask, interface);
     m_networkRoutes.push_back(route);
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::AddASExternalRouteTo(Ipv4Address network,
-                                        Ipv4Mask networkMask,
-                                        Ipv4Address nextHop,
-                                        uint32_t interface)
+GlobalRouting<T>::AddASExternalRouteTo(IpAddress network,
+                                       IpMaskOrPrefix networkMask,
+                                       IpAddress nextHop,
+                                       uint32_t interface)
 {
     NS_LOG_FUNCTION(this << network << networkMask << nextHop << interface);
-    auto route = new Ipv4RoutingTableEntry();
-    *route = Ipv4RoutingTableEntry::CreateNetworkRouteTo(network, networkMask, nextHop, interface);
+    auto route = new IpRoutingTableEntry();
+    *route = IpRoutingTableEntry::CreateNetworkRouteTo(network, networkMask, nextHop, interface);
     m_ASexternalRoutes.push_back(route);
 }
 
-Ptr<Ipv4Route>
-Ipv4GlobalRouting::LookupGlobal(Ipv4Address dest, Ptr<NetDevice> oif)
+template <typename T>
+Ptr<typename GlobalRouting<T>::IpRoute>
+GlobalRouting<T>::LookupGlobal(IpAddress dest, Ptr<NetDevice> oif)
 {
     NS_LOG_FUNCTION(this << dest << oif);
     NS_LOG_LOGIC("Looking for route for destination " << dest);
-    Ptr<Ipv4Route> rtentry = nullptr;
+    Ptr<IpRoute> rtentry = nullptr;
     // store all available routes that bring packets to their destination
-    typedef std::vector<Ipv4RoutingTableEntry*> RouteVec_t;
+    typedef std::vector<IpRoutingTableEntry*> RouteVec_t;
     RouteVec_t allRoutes;
 
     NS_LOG_LOGIC("Number of m_hostRoutes = " << m_hostRoutes.size());
@@ -202,7 +242,7 @@ Ipv4GlobalRouting::LookupGlobal(Ipv4Address dest, Ptr<NetDevice> oif)
         {
             selectIndex = 0;
         }
-        Ipv4RoutingTableEntry* route = allRoutes.at(selectIndex);
+        IpRoutingTableEntry* route = allRoutes.at(selectIndex);
         // create a Ipv4Route object from the selected routing table entry
         rtentry = Create<Ipv4Route>();
         rtentry->SetDestination(route->GetDest());
@@ -219,8 +259,9 @@ Ipv4GlobalRouting::LookupGlobal(Ipv4Address dest, Ptr<NetDevice> oif)
     }
 }
 
+template <typename T>
 uint32_t
-Ipv4GlobalRouting::GetNRoutes() const
+GlobalRouting<T>::GetNRoutes() const
 {
     NS_LOG_FUNCTION(this);
     uint32_t n = 0;
@@ -230,8 +271,9 @@ Ipv4GlobalRouting::GetNRoutes() const
     return n;
 }
 
-Ipv4RoutingTableEntry*
-Ipv4GlobalRouting::GetRoute(uint32_t index) const
+template <typename T>
+GlobalRouting<T>::IpRoutingTableEntry*
+GlobalRouting<T>::GetRoute(uint32_t index) const
 {
     NS_LOG_FUNCTION(this << index);
     if (index < m_hostRoutes.size())
@@ -274,8 +316,9 @@ Ipv4GlobalRouting::GetRoute(uint32_t index) const
     return nullptr;
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::RemoveRoute(uint32_t index)
+GlobalRouting<T>::RemoveRoute(uint32_t index)
 {
     NS_LOG_FUNCTION(this << index);
     if (index < m_hostRoutes.size())
@@ -328,16 +371,18 @@ Ipv4GlobalRouting::RemoveRoute(uint32_t index)
     NS_ASSERT(false);
 }
 
+template <typename T>
 int64_t
-Ipv4GlobalRouting::AssignStreams(int64_t stream)
+GlobalRouting<T>::AssignStreams(int64_t stream)
 {
     NS_LOG_FUNCTION(this << stream);
     m_rand->SetStream(stream);
     return 1;
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::DoDispose()
+GlobalRouting<T>::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     for (auto i = m_hostRoutes.begin(); i != m_hostRoutes.end(); i = m_hostRoutes.erase(i))
@@ -358,8 +403,9 @@ Ipv4GlobalRouting::DoDispose()
 }
 
 // Formatted like output of "route -n" command
+template <typename T>
 void
-Ipv4GlobalRouting::PrintRoutingTable(Ptr<OutputStreamWrapper> stream, Time::Unit unit) const
+GlobalRouting<T>::PrintRoutingTable(Ptr<OutputStreamWrapper> stream, Time::Unit unit) const
 {
     NS_LOG_FUNCTION(this << stream);
     std::ostream* os = stream->GetStream();
@@ -369,8 +415,8 @@ Ipv4GlobalRouting::PrintRoutingTable(Ptr<OutputStreamWrapper> stream, Time::Unit
 
     *os << std::resetiosflags(std::ios::adjustfield) << std::setiosflags(std::ios::left);
 
-    *os << "Node: " << m_ipv4->GetObject<Node>()->GetId() << ", Time: " << Now().As(unit)
-        << ", Local time: " << m_ipv4->GetObject<Node>()->GetLocalTime().As(unit)
+    *os << "Node: " << m_ipv4->template GetObject<Node>()->GetId() << ", Time: " << Now().As(unit)
+        << ", Local time: " << m_ipv4->template GetObject<Node>()->GetLocalTime().As(unit)
         << ", Ipv4GlobalRouting table" << std::endl;
 
     if (GetNRoutes() > 0)
@@ -383,7 +429,7 @@ Ipv4GlobalRouting::PrintRoutingTable(Ptr<OutputStreamWrapper> stream, Time::Unit
             std::ostringstream gw;
             std::ostringstream mask;
             std::ostringstream flags;
-            Ipv4RoutingTableEntry route = GetRoute(j);
+            IpRoutingTableEntry route = GetRoute(j);
             dest << route.GetDest();
             *os << std::setw(16) << dest.str();
             gw << route.GetGateway();
@@ -425,11 +471,12 @@ Ipv4GlobalRouting::PrintRoutingTable(Ptr<OutputStreamWrapper> stream, Time::Unit
     (*os).copyfmt(oldState);
 }
 
-Ptr<Ipv4Route>
-Ipv4GlobalRouting::RouteOutput(Ptr<Packet> p,
-                               const Ipv4Header& header,
-                               Ptr<NetDevice> oif,
-                               Socket::SocketErrno& sockerr)
+template <typename T>
+Ptr<typename GlobalRouting<T>::IpRoute>
+GlobalRouting<T>::RouteOutput(Ptr<Packet> p,
+                              const IpHeader& header,
+                              Ptr<NetDevice> oif,
+                              Socket::SocketErrno& sockerr)
 {
     NS_LOG_FUNCTION(this << p << &header << oif << &sockerr);
     //
@@ -445,7 +492,7 @@ Ipv4GlobalRouting::RouteOutput(Ptr<Packet> p,
     // See if this is a unicast packet we have a route for.
     //
     NS_LOG_LOGIC("Unicast destination- looking up");
-    Ptr<Ipv4Route> rtentry = LookupGlobal(header.GetDestination(), oif);
+    Ptr<IpRoute> rtentry = LookupGlobal(header.GetDestination(), oif);
     if (rtentry)
     {
         sockerr = Socket::ERROR_NOTERROR;
@@ -457,14 +504,15 @@ Ipv4GlobalRouting::RouteOutput(Ptr<Packet> p,
     return rtentry;
 }
 
+template <typename T>
 bool
-Ipv4GlobalRouting::RouteInput(Ptr<const Packet> p,
-                              const Ipv4Header& header,
-                              Ptr<const NetDevice> idev,
-                              const UnicastForwardCallback& ucb,
-                              const MulticastForwardCallback& mcb,
-                              const LocalDeliverCallback& lcb,
-                              const ErrorCallback& ecb)
+GlobalRouting<T>::RouteInput(Ptr<const Packet> p,
+                             const IpHeader& header,
+                             Ptr<const NetDevice> idev,
+                             const UnicastForwardCallback& ucb,
+                             const MulticastForwardCallback& mcb,
+                             const LocalDeliverCallback& lcb,
+                             const ErrorCallback& ecb)
 {
     NS_LOG_FUNCTION(this << p << header << header.GetSource() << header.GetDestination() << idev
                          << &lcb << &ecb);
@@ -500,7 +548,7 @@ Ipv4GlobalRouting::RouteInput(Ptr<const Packet> p,
     }
     // Next, try to find a route
     NS_LOG_LOGIC("Unicast destination- looking up global route");
-    Ptr<Ipv4Route> rtentry = LookupGlobal(header.GetDestination());
+    Ptr<IpRoute> rtentry = LookupGlobal(header.GetDestination());
     if (rtentry)
     {
         NS_LOG_LOGIC("Found unicast destination- calling unicast callback");
@@ -515,60 +563,67 @@ Ipv4GlobalRouting::RouteInput(Ptr<const Packet> p,
     }
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::NotifyInterfaceUp(uint32_t i)
+GlobalRouting<T>::NotifyInterfaceUp(uint32_t i)
 {
     NS_LOG_FUNCTION(this << i);
     if (m_respondToInterfaceEvents && Simulator::Now().GetSeconds() > 0) // avoid startup events
     {
-        GlobalRouteManager::DeleteGlobalRoutes();
-        GlobalRouteManager::BuildGlobalRoutingDatabase();
-        GlobalRouteManager::InitializeRoutes();
+        GlobalRouteManager<IpManager>::DeleteGlobalRoutes();
+        GlobalRouteManager<IpManager>::BuildGlobalRoutingDatabase();
+        GlobalRouteManager<IpManager>::InitializeRoutes();
     }
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::NotifyInterfaceDown(uint32_t i)
+GlobalRouting<T>::NotifyInterfaceDown(uint32_t i)
 {
     NS_LOG_FUNCTION(this << i);
     if (m_respondToInterfaceEvents && Simulator::Now().GetSeconds() > 0) // avoid startup events
     {
-        GlobalRouteManager::DeleteGlobalRoutes();
-        GlobalRouteManager::BuildGlobalRoutingDatabase();
-        GlobalRouteManager::InitializeRoutes();
+        GlobalRouteManager<IpManager>::DeleteGlobalRoutes();
+        GlobalRouteManager<IpManager>::BuildGlobalRoutingDatabase();
+        GlobalRouteManager<IpManager>::InitializeRoutes();
     }
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::NotifyAddAddress(uint32_t interface, Ipv4InterfaceAddress address)
+GlobalRouting<T>::NotifyAddAddress(uint32_t interface, IpInterfaceAddress address)
 {
     NS_LOG_FUNCTION(this << interface << address);
     if (m_respondToInterfaceEvents && Simulator::Now().GetSeconds() > 0) // avoid startup events
     {
-        GlobalRouteManager::DeleteGlobalRoutes();
-        GlobalRouteManager::BuildGlobalRoutingDatabase();
-        GlobalRouteManager::InitializeRoutes();
+        GlobalRouteManager<IpManager>::DeleteGlobalRoutes();
+        GlobalRouteManager<IpManager>::BuildGlobalRoutingDatabase();
+        GlobalRouteManager<IpManager>::InitializeRoutes();
     }
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::NotifyRemoveAddress(uint32_t interface, Ipv4InterfaceAddress address)
+GlobalRouting<T>::NotifyRemoveAddress(uint32_t interface, IpInterfaceAddress address)
 {
     NS_LOG_FUNCTION(this << interface << address);
     if (m_respondToInterfaceEvents && Simulator::Now().GetSeconds() > 0) // avoid startup events
     {
-        GlobalRouteManager::DeleteGlobalRoutes();
-        GlobalRouteManager::BuildGlobalRoutingDatabase();
-        GlobalRouteManager::InitializeRoutes();
+        GlobalRouteManager<IpManager>::DeleteGlobalRoutes();
+        GlobalRouteManager<IpManager>::BuildGlobalRoutingDatabase();
+        GlobalRouteManager<IpManager>::InitializeRoutes();
     }
 }
 
+template <typename T>
 void
-Ipv4GlobalRouting::SetIpv4(Ptr<Ipv4> ipv4)
+GlobalRouting<T>::SetIpv4(Ptr<Ip> ipv4)
 {
     NS_LOG_FUNCTION(this << ipv4);
     NS_ASSERT(!m_ipv4 && ipv4);
     m_ipv4 = ipv4;
 }
+
+NS_OBJECT_TEMPLATE_CLASS_DEFINE(GlobalRouting, Ipv4RoutingProtocol);
 
 } // namespace ns3

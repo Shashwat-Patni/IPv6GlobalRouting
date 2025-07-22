@@ -36,11 +36,12 @@ Ipv4GlobalRoutingHelper::Create(Ptr<Node> node) const
 {
     NS_LOG_LOGIC("Adding GlobalRouter interface to node " << node->GetId());
 
-    Ptr<GlobalRouter> globalRouter = CreateObject<GlobalRouter>();
+    Ptr<GlobalRouter<Ipv4Manager>> globalRouter = CreateObject<GlobalRouter<Ipv4Manager>>();
     node->AggregateObject(globalRouter);
 
     NS_LOG_LOGIC("Adding GlobalRouting Protocol to node " << node->GetId());
-    Ptr<Ipv4GlobalRouting> globalRouting = CreateObject<Ipv4GlobalRouting>();
+    Ptr<GlobalRouting<Ipv4RoutingProtocol>> globalRouting =
+        CreateObject<GlobalRouting<Ipv4RoutingProtocol>>();
     globalRouter->SetRoutingProtocol(globalRouting);
 
     return globalRouting;
@@ -49,16 +50,16 @@ Ipv4GlobalRoutingHelper::Create(Ptr<Node> node) const
 void
 Ipv4GlobalRoutingHelper::PopulateRoutingTables()
 {
-    GlobalRouteManager::BuildGlobalRoutingDatabase();
-    GlobalRouteManager::InitializeRoutes();
+    GlobalRouteManager<Ipv4Manager>::BuildGlobalRoutingDatabase();
+    GlobalRouteManager<Ipv4Manager>::InitializeRoutes();
 }
 
 void
 Ipv4GlobalRoutingHelper::RecomputeRoutingTables()
 {
-    GlobalRouteManager::DeleteGlobalRoutes();
-    GlobalRouteManager::BuildGlobalRoutingDatabase();
-    GlobalRouteManager::InitializeRoutes();
+    GlobalRouteManager<Ipv4Manager>::DeleteGlobalRoutes();
+    GlobalRouteManager<Ipv4Manager>::BuildGlobalRoutingDatabase();
+    GlobalRouteManager<Ipv4Manager>::InitializeRoutes();
 }
 
 } // namespace ns3
