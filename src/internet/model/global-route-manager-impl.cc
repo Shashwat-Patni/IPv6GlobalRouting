@@ -1741,7 +1741,7 @@ GlobalRouteManagerImpl::SPFProcessStubs(SPFVertex* v, uint32_t stubDistance)
                                 // supported.
                                 stubNetworkRoutes.emplace_back(key, ifHop);
                             }
-                            else 
+                            else
                             {
                                 if (outIf == it->second.first)
                                 {
